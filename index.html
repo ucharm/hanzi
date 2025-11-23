@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#fff1f2">
-    <meta name="description" content="绵绵识字 - 儿童趣味汉字测试">
+    <meta name="description" content="柠小花卷识字 - 儿童趣味汉字测试">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="绵绵识字">
-    <title>绵绵识字</title>
+    <meta name="apple-mobile-web-app-title" content="柠小花卷识字">
+    <title>柠小花卷识字</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
@@ -83,7 +83,7 @@
     <div id="screen-welcome" class="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-6">
         <div class="space-y-2 mb-8">
             <div class="text-7xl animate-bounce">🐼</div>
-            <h1 class="text-6xl font-black text-sky-500 tracking-wider drop-shadow-sm">绵绵识字</h1>
+            <h1 class="text-6xl font-black text-sky-500 tracking-wider drop-shadow-sm">柠小花卷识字</h1>
         </div>
         
         <!-- Game Mode Buttons (Unified) -->
@@ -127,6 +127,14 @@
                     <input type="text" id="base-url-input" placeholder="默认 (空)" 
                         class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 focus:border-sky-400 focus:outline-none text-center bg-white/90 font-mono text-sm" />
                     <p class="text-[10px] text-gray-400 leading-tight text-center">国内直连请填代理地址<br>(例如: https://api.laozhang.ai/v1)</p>
+                </div>
+
+                <!-- Model Name Input -->
+                <div class="space-y-1">
+                    <label class="text-[10px] text-gray-400 font-bold ml-2 uppercase">模型名称 (Model Name)</label>
+                    <input type="text" id="model-name-input" placeholder="默认 (Gemini 1.5/2.5)" 
+                        class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 focus:border-sky-400 focus:outline-none text-center bg-white/90 font-mono text-sm" />
+                    <p class="text-[10px] text-gray-400 leading-tight text-center">如代理报错，尝试填 gemini-pro 或 gemini-1.5-pro</p>
                 </div>
             </div>
         </div>
@@ -263,7 +271,8 @@
             currentIndex: 0,
             score: 0,
             apiKey: localStorage.getItem('GEMINI_API_KEY') || '',
-            baseUrl: localStorage.getItem('GEMINI_BASE_URL') || ''
+            baseUrl: localStorage.getItem('GEMINI_BASE_URL') || '',
+            modelName: localStorage.getItem('GEMINI_MODEL_NAME') || ''
         };
 
         // --- STORAGE KEYS ---
@@ -359,10 +368,12 @@
         };
         const inputKey = document.getElementById('api-key-input');
         const inputBaseUrl = document.getElementById('base-url-input');
+        const inputModelName = document.getElementById('model-name-input');
 
         // Init
         if (appState.apiKey) inputKey.value = appState.apiKey;
         if (appState.baseUrl) inputBaseUrl.value = appState.baseUrl;
+        if (appState.modelName) inputModelName.value = appState.modelName;
         updateStats();
 
         // --- NAVIGATION ---
@@ -461,6 +472,7 @@
 
             const key = inputKey.value.trim();
             const url = inputBaseUrl.value.trim();
+            const model = inputModelName.value.trim();
             
             if (!key) {
                 const el = document.getElementById('settings-panel');
@@ -475,14 +487,17 @@
             
             appState.apiKey = key;
             appState.baseUrl = url;
+            appState.modelName = model;
+
             localStorage.setItem('GEMINI_API_KEY', key);
             localStorage.setItem('GEMINI_BASE_URL', url);
+            localStorage.setItem('GEMINI_MODEL_NAME', model);
 
             showScreen('loading');
 
             try {
                 const mastered = getMasteredChars();
-                const data = await fetchQuizData(appState.apiKey, appState.baseUrl, mastered);
+                const data = await fetchQuizData(appState.apiKey, appState.baseUrl, appState.modelName, mastered);
                 
                 // Randomly assign mode to each item
                 data.items.forEach(item => {
@@ -498,8 +513,8 @@
             } catch (e) {
                 console.error(e);
                 let msg = "出题失败了：\n" + e.message;
-                if(e.message.includes('403') || e.message.includes('Failed to fetch')) {
-                   msg += "\n\n提示：请检查网络或确认代理地址是否正确。";
+                if(e.message.includes('403') || e.message.includes('Failed to fetch') || e.message.includes('503')) {
+                   msg += "\n\n提示：\n1. 请检查网络或代理地址。\n2. 如果使用免费代理，尝试在设置中将模型改为 'gemini-pro' 或 'gemini-1.5-pro'。";
                 }
                 alert(msg);
                 showScreen('welcome');
@@ -521,7 +536,7 @@
         };
 
         // --- GEMINI SERVICE ---
-        async function fetchQuizData(apiKey, baseUrl, excludedChars) {
+        async function fetchQuizData(apiKey, baseUrl, modelName, excludedChars) {
             const excludedStr = excludedChars.slice(-50).join(', ');
             const promptText = `
             Create 10 quiz items for Chinese primary school students (Grades 1-2).
@@ -558,6 +573,9 @@
                     url = `${url}/chat/completions`;
                 }
 
+                // Default to gemini-1.5-flash if modelName is not provided
+                const targetModel = modelName || "gemini-1.5-flash";
+
                 // Use simple fetch to bypass Google SDK
                 const response = await fetch(url, {
                     method: 'POST',
@@ -566,7 +584,7 @@
                         'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: "gemini-1.5-flash", // Use 1.5-flash as it is widely supported by proxies
+                        model: targetModel,
                         messages: [
                             { role: "system", content: "You are a helpful JSON generator." },
                             { role: "user", content: promptText }
@@ -593,9 +611,12 @@
             const options = { apiKey };
             if (baseUrl && baseUrl.length > 0) options.baseUrl = baseUrl;
 
+            // Default to gemini-2.5-flash if modelName is not provided for SDK
+            const targetModel = modelName || "gemini-2.5-flash";
+
             const ai = new GoogleGenAI(options);
             const response = await ai.models.generateContent({
-                model: "gemini-2.5-flash",
+                model: targetModel,
                 contents: promptText,
                 config: { responseMimeType: "application/json" }
             });

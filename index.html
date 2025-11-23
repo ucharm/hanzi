@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#fff1f2">
-    <meta name="description" content="萌萌识字 - 儿童趣味汉字测试">
+    <meta name="description" content="绵绵识字 - 儿童趣味汉字测试">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="萌萌识字">
-    <title>萌萌识字 - 趣味闯关</title>
+    <meta name="apple-mobile-web-app-title" content="绵绵识字">
+    <title>绵绵识字 - 趣味闯关</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
@@ -72,12 +72,12 @@
     <div id="screen-welcome" class="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-6">
         <div class="space-y-2">
             <div class="text-7xl animate-bounce">🐼</div>
-            <h1 class="text-6xl font-black text-sky-500 tracking-wider drop-shadow-sm">萌萌识字</h1>
+            <h1 class="text-6xl font-black text-sky-500 tracking-wider drop-shadow-sm">绵绵识字</h1>
             <p class="text-xl text-gray-500 font-bold">和 AI 老师一起挑战汉字！</p>
         </div>
         
         <!-- Settings Area -->
-        <div class="w-full max-w-xs space-y-4 bg-white/50 p-4 rounded-3xl border border-pink-100">
+        <div class="w-full max-w-xs space-y-3 bg-white/50 p-4 rounded-3xl border border-pink-100">
             <!-- API Key Input -->
             <div class="space-y-1">
                 <label class="text-xs text-gray-400 font-bold ml-2">API Key</label>
@@ -85,8 +85,14 @@
                     class="w-full px-4 py-2 rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none text-center bg-white/80 font-mono" />
             </div>
 
-            <!-- Base URL Input (For Proxy) -->
-            <div class="space-y-1">
+            <!-- Settings Toggle -->
+            <button onclick="toggleSettings()" class="w-full text-center text-xs text-gray-400 font-bold hover:text-sky-500 transition-colors flex items-center justify-center gap-1">
+                <span>⚙️ 高级设置 (Server URL)</span>
+                <span id="settings-arrow">▼</span>
+            </button>
+
+            <!-- Base URL Input (Hidden by default) -->
+            <div id="advanced-settings" class="hidden space-y-1 pt-2 border-t border-gray-100">
                 <label class="text-xs text-gray-400 font-bold ml-2">服务器地址 (Base URL)</label>
                 <input type="text" id="base-url-input" placeholder="默认 (空)" 
                     class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 focus:border-sky-400 focus:outline-none text-center bg-white/80 text-sm font-mono" />
@@ -354,6 +360,17 @@
             playSound('click');
             showScreen('welcome');
             updateStats();
+        };
+
+        window.toggleSettings = () => {
+            const el = document.getElementById('advanced-settings');
+            const arrow = document.getElementById('settings-arrow');
+            el.classList.toggle('hidden');
+            if (el.classList.contains('hidden')) {
+                arrow.innerText = '▼';
+            } else {
+                arrow.innerText = '▲';
+            }
         };
 
         // --- MISTAKE UI HANDLERS ---

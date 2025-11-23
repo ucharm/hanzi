@@ -1,6 +1,6 @@
 {
-  "name": "萌萌识字",
-  "short_name": "萌萌识字",
+  "name": "绵绵识字",
+  "short_name": "绵绵识字",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fff1f2",

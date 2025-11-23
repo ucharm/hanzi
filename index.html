@@ -81,19 +81,18 @@
 
     <!-- 1. WELCOME SCREEN -->
     <div id="screen-welcome" class="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-6">
-        <div class="space-y-2 mb-4">
+        <div class="space-y-2 mb-8">
             <div class="text-7xl animate-bounce">🐼</div>
             <h1 class="text-6xl font-black text-sky-500 tracking-wider drop-shadow-sm">绵绵识字</h1>
-            <p class="text-xl text-gray-500 font-bold">和 AI 老师一起挑战汉字！</p>
+            <!-- Slogan removed as requested -->
         </div>
         
-        <!-- Game Mode Buttons (Prominent) -->
+        <!-- Game Mode Buttons (Unified) -->
         <div class="flex flex-col gap-4 w-full max-w-xs z-10">
-            <button onclick="startGame('HANZI_TO_PINYIN')" class="bg-sky-400 hover:bg-sky-500 text-white border-b-4 border-sky-600 font-bold rounded-2xl px-6 py-4 text-xl active:scale-95 transition-all w-full shadow-lg">
-                看字选音 <span class="text-sm opacity-80 ml-2 font-normal">(汉 ➔ pin)</span>
-            </button>
-            <button onclick="startGame('PINYIN_TO_HANZI')" class="bg-purple-400 hover:bg-purple-500 text-white border-b-4 border-purple-600 font-bold rounded-2xl px-6 py-4 text-xl active:scale-95 transition-all w-full shadow-lg">
-                看音选字 <span class="text-sm opacity-80 ml-2 font-normal">(pin ➔ 汉)</span>
+            <!-- Unified Start Button -->
+            <button onclick="startGame()" class="bg-sky-400 hover:bg-sky-500 text-white border-b-4 border-sky-600 font-bold rounded-2xl px-6 py-5 text-2xl active:scale-95 transition-all w-full shadow-lg flex flex-col items-center">
+                <span>🚀 开始挑战</span>
+                <span class="text-sm opacity-80 font-normal mt-1 text-sky-100">看字选音 / 看音选字 (混合)</span>
             </button>
 
             <!-- Mistake Book Button -->
@@ -261,8 +260,7 @@
 
         // --- STATE ---
         let appState = {
-            mode: 'HANZI_TO_PINYIN', // or 'PINYIN_TO_HANZI' or 'REVIEW'
-            items: [],
+            items: [], // Each item now has a 'mode' property: 'HANZI_TO_PINYIN' or 'PINYIN_TO_HANZI'
             currentIndex: 0,
             score: 0,
             apiKey: localStorage.getItem('GEMINI_API_KEY') || '',
@@ -304,7 +302,15 @@
             let list = getMistakes();
             // Avoid duplicates
             if (!list.find(i => i.character === item.character)) {
-                list.push(item);
+                // Ensure we save a clean item without the temporary mode property
+                const cleanItem = {
+                    character: item.character,
+                    pinyin: item.pinyin,
+                    wrongPinyins: item.wrongPinyins,
+                    wrongChars: item.wrongChars,
+                    examples: item.examples
+                };
+                list.push(cleanItem);
                 localStorage.setItem(MISTAKE_KEY, JSON.stringify(list));
                 updateStats();
             }
@@ -429,28 +435,35 @@
             playSound('start');
             
             // Setup Review Mode
-            appState.mode = 'REVIEW';
             // Shuffle mistakes
-            appState.items = [...list].sort(() => Math.random() - 0.5);
-            // Limit to 10 for a session, or take all if less
-            if (appState.items.length > 10) appState.items = appState.items.slice(0, 10);
+            let items = [...list].sort(() => Math.random() - 0.5);
+            // Limit to 10 for a session
+            if (items.length > 10) items = items.slice(0, 10);
             
+            // Assign random mode to each review item
+            items.forEach(item => {
+                item.mode = Math.random() < 0.5 ? 'HANZI_TO_PINYIN' : 'PINYIN_TO_HANZI';
+            });
+            
+            appState.items = items;
             appState.currentIndex = 0;
             appState.score = 0;
+            appState.isReview = true; // Flag to know if we are in review
+            
             renderQuestion();
             showScreen('quiz');
         }
 
         // --- GAME START LOGIC (API) ---
-        window.startGame = async (mode) => {
+        window.startGame = async () => {
             initAudio(); 
             playSound('start');
+            appState.isReview = false;
 
             const key = inputKey.value.trim();
             const url = inputBaseUrl.value.trim();
             
             if (!key) {
-                // Auto-open settings if key is missing
                 const el = document.getElementById('settings-panel');
                 if(el.classList.contains('hidden')) {
                     window.toggleSettingsPanel();
@@ -458,7 +471,6 @@
                 el.classList.add('shake');
                 setTimeout(() => el.classList.remove('shake'), 500);
                 inputKey.focus();
-                // alert("请先填写 API Key 哦！");
                 return;
             }
             
@@ -467,12 +479,17 @@
             localStorage.setItem('GEMINI_API_KEY', key);
             localStorage.setItem('GEMINI_BASE_URL', url);
 
-            appState.mode = mode;
             showScreen('loading');
 
             try {
                 const mastered = getMasteredChars();
                 const data = await fetchQuizData(appState.apiKey, appState.baseUrl, mastered);
+                
+                // Randomly assign mode to each item
+                data.items.forEach(item => {
+                    item.mode = Math.random() < 0.5 ? 'HANZI_TO_PINYIN' : 'PINYIN_TO_HANZI';
+                });
+
                 appState.items = data.items;
                 appState.currentIndex = 0;
                 appState.score = 0;
@@ -491,8 +508,7 @@
         };
 
         window.replayGame = () => {
-            // If we were Reviewing, restart review with remaining mistakes
-            if (appState.mode === 'REVIEW') {
+            if (appState.isReview) {
                 const list = getMistakes();
                 if (list.length > 0) {
                     window.startReviewGame();
@@ -501,7 +517,7 @@
                     goHome();
                 }
             } else {
-                window.startGame(appState.mode);
+                window.startGame();
             }
         };
 
@@ -545,7 +561,8 @@
         // --- RENDER GAME ---
         function renderQuestion() {
             const item = appState.items[appState.currentIndex];
-            const isHanziMode = (appState.mode === 'HANZI_TO_PINYIN' || appState.mode === 'REVIEW');
+            // Determine mode from item property. Default to HANZI_TO_PINYIN if missing.
+            const isHanziMode = (item.mode === 'HANZI_TO_PINYIN');
 
             // Update Header
             document.getElementById('current-q-num').innerText = appState.currentIndex + 1;
@@ -558,7 +575,6 @@
             qText.innerText = isHanziMode ? item.character : item.pinyin;
             
             // Adjust font size for pinyin vs hanzi
-            // Pinyin uses Quicksand (Bold), Hanzi uses Noto Sans SC (Black/900)
             qText.className = isHanziMode 
                 ? "font-black z-10 text-slate-700 text-8xl transition-all" 
                 : "font-bold z-10 text-slate-700 text-6xl transition-all font-sans";

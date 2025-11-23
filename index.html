@@ -145,6 +145,7 @@
         <div class="w-20 h-20 border-8 border-sky-200 border-t-sky-500 rounded-full animate-spin mb-8"></div>
         <h2 class="text-3xl font-bold text-sky-600 mb-2">正在出题中...</h2>
         <p class="text-gray-400">AI 老师正在准备试卷...</p>
+        <p id="retry-message" class="text-orange-400 text-sm mt-4 hidden font-bold animate-pulse">网络有点卡，正在尝试切换线路...</p>
     </div>
 
     <!-- 3. QUIZ SCREEN -->
@@ -380,6 +381,11 @@
         function showScreen(name) {
             Object.values(screens).forEach(el => el.classList.add('hidden'));
             if(screens[name]) screens[name].classList.remove('hidden');
+            
+            // Reset retry message on loading screen
+            if (name === 'loading') {
+                 document.getElementById('retry-message').classList.add('hidden');
+            }
         }
 
         window.goHome = () => {
@@ -512,9 +518,9 @@
                 showScreen('quiz');
             } catch (e) {
                 console.error(e);
-                let msg = "出题失败了：\n" + e.message;
-                if(e.message.includes('403') || e.message.includes('Failed to fetch') || e.message.includes('503')) {
-                   msg += "\n\n提示：\n1. 请检查网络或代理地址。\n2. 如果使用免费代理，尝试在设置中将模型改为 'gemini-pro' 或 'gemini-1.5-pro'。";
+                let msg = "出题失败了 (T_T)\n" + e.message;
+                if(e.message.includes('403') || e.message.includes('Failed to fetch') || e.message.includes('503') || e.message.includes('Proxy Error')) {
+                   msg += "\n\n💡 提示：\n系统已经尝试了自动切换线路，但似乎都不行。\n请检查您的网络，或者在设置中手动填入 'gemini-1.5-pro' 再试一次。";
                 }
                 alert(msg);
                 showScreen('welcome');
@@ -573,38 +579,67 @@
                     url = `${url}/chat/completions`;
                 }
 
+                // Helper to fetch with a specific model
+                const doFetch = async (targetModel) => {
+                     const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: targetModel,
+                            messages: [
+                                { role: "system", content: "You are a helpful JSON generator." },
+                                { role: "user", content: promptText }
+                            ],
+                            temperature: 0.7
+                        })
+                    });
+
+                    if (!response.ok) {
+                         const errText = await response.text();
+                         throw new Error(`Proxy Error (${response.status}): ${errText}`);
+                    }
+                    return response.json();
+                };
+
                 // Default to gemini-1.5-flash if modelName is not provided
-                const targetModel = modelName || "gemini-1.5-flash";
-
-                // Use simple fetch to bypass Google SDK
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: targetModel,
-                        messages: [
-                            { role: "system", content: "You are a helpful JSON generator." },
-                            { role: "user", content: promptText }
-                        ],
-                        temperature: 0.7
-                    })
-                });
-
-                if (!response.ok) {
-                    const err = await response.text();
-                    throw new Error(`Proxy Error (${response.status}): ${err}`);
-                }
-
-                const data = await response.json();
-                const content = data.choices?.[0]?.message?.content;
-                if (!content) throw new Error("No content received from proxy");
+                let initialModel = modelName || "gemini-1.5-flash";
                 
-                // Clean markdown if present
-                const jsonStr = content.replace(/```json/g, '').replace(/```/g, '').trim();
-                return JSON.parse(jsonStr);
+                try {
+                    // 1. Try Initial Model
+                    const data = await doFetch(initialModel);
+                    
+                    const content = data.choices?.[0]?.message?.content;
+                    if (!content) throw new Error("No content received from proxy");
+                    const jsonStr = content.replace(/```json/g, '').replace(/```/g, '').trim();
+                    return JSON.parse(jsonStr);
+
+                } catch (error) {
+                    // 2. RETRY LOGIC
+                    // If the user didn't specify a custom model, and the default flash model failed...
+                    if (!modelName && error.message.includes('Proxy Error')) {
+                        console.warn(`Model ${initialModel} failed. Retrying with gemini-pro...`);
+                        
+                        // Show retry message on UI
+                        const retryMsg = document.getElementById('retry-message');
+                        if(retryMsg) retryMsg.classList.remove('hidden');
+
+                        try {
+                            const data = await doFetch("gemini-pro");
+                            const content = data.choices?.[0]?.message?.content;
+                            if (!content) throw new Error("No content received from proxy (retry)");
+                            const jsonStr = content.replace(/```json/g, '').replace(/```/g, '').trim();
+                            return JSON.parse(jsonStr);
+                        } catch (retryError) {
+                            // If retry also fails, throw original error or new error
+                            throw new Error(error.message + "\n(自动切换 gemini-pro 重试也失败了)");
+                        }
+                    } else {
+                        throw error;
+                    }
+                }
             }
 
             // --- STRATEGY 2: Google Official SDK (for AIza keys) ---

@@ -54,19 +54,32 @@
 <body class="min-h-screen text-slate-800 bg-gradient-to-br from-pink-50 via-white to-sky-50">
 
     <!-- 1. WELCOME SCREEN -->
-    <div id="screen-welcome" class="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-8">
-        <div class="text-7xl animate-bounce">🐼</div>
-        <h1 class="text-6xl font-black text-sky-500 tracking-wider drop-shadow-sm">萌萌识字</h1>
-        <p class="text-xl text-gray-500">和 AI 老师一起挑战汉字！</p>
+    <div id="screen-welcome" class="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-6">
+        <div class="space-y-2">
+            <div class="text-7xl animate-bounce">🐼</div>
+            <h1 class="text-6xl font-black text-sky-500 tracking-wider drop-shadow-sm">萌萌识字</h1>
+            <p class="text-xl text-gray-500">和 AI 老师一起挑战汉字！</p>
+        </div>
         
-        <!-- API Key Input -->
-        <div class="w-full max-w-xs space-y-2">
-            <input type="password" id="api-key-input" placeholder="粘贴你的 API Key" 
-                class="w-full px-4 py-3 rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none text-center bg-white/80" />
-            <p class="text-xs text-gray-400">Key 仅保存在你的浏览器中，不会上传</p>
+        <!-- Settings Area -->
+        <div class="w-full max-w-xs space-y-4 bg-white/50 p-4 rounded-3xl border border-pink-100">
+            <!-- API Key Input -->
+            <div class="space-y-1">
+                <label class="text-xs text-gray-400 font-bold ml-2">API Key</label>
+                <input type="password" id="api-key-input" placeholder="粘贴你的 API Key" 
+                    class="w-full px-4 py-2 rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none text-center bg-white/80" />
+            </div>
+
+            <!-- Base URL Input (For Proxy) -->
+            <div class="space-y-1">
+                <label class="text-xs text-gray-400 font-bold ml-2">服务器地址 (Base URL)</label>
+                <input type="text" id="base-url-input" placeholder="默认 (空)" 
+                    class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 focus:border-sky-400 focus:outline-none text-center bg-white/80 text-sm" />
+                <p class="text-[10px] text-gray-400 leading-tight">国内直连请填代理地址<br>例如: https://你的中转域名/gemini</p>
+            </div>
         </div>
 
-        <div class="flex flex-col gap-4 w-full max-w-xs pt-4">
+        <div class="flex flex-col gap-4 w-full max-w-xs pt-2">
             <button onclick="startGame('HANZI_TO_PINYIN')" class="bg-sky-400 hover:bg-sky-500 text-white border-b-4 border-sky-600 font-bold rounded-2xl px-6 py-4 text-xl active:scale-95 transition-all w-full shadow-lg">
                 看字选音 <span class="text-sm opacity-80 ml-2">(汉 ➔ pin)</span>
             </button>
@@ -182,7 +195,8 @@
             items: [],
             currentIndex: 0,
             score: 0,
-            apiKey: localStorage.getItem('GEMINI_API_KEY') || ''
+            apiKey: localStorage.getItem('GEMINI_API_KEY') || '',
+            baseUrl: localStorage.getItem('GEMINI_BASE_URL') || ''
         };
 
         // --- DOM ELEMENTS ---
@@ -196,9 +210,11 @@
             feedback: document.getElementById('modal-feedback')
         };
         const inputKey = document.getElementById('api-key-input');
+        const inputBaseUrl = document.getElementById('base-url-input');
 
-        // Initialize Input
+        // Initialize Inputs
         if (appState.apiKey) inputKey.value = appState.apiKey;
+        if (appState.baseUrl) inputBaseUrl.value = appState.baseUrl;
 
         // --- NAVIGATION ---
         function showScreen(name) {
@@ -216,21 +232,26 @@
             initAudio(); // Unlock audio context
             playSound('start');
 
-            // Save API Key
+            // Save Config
             const key = inputKey.value.trim();
+            const url = inputBaseUrl.value.trim();
+            
             if (!key) {
                 alert("请先输入 API Key 才能开始哦！");
                 return;
             }
+            
             appState.apiKey = key;
+            appState.baseUrl = url;
             localStorage.setItem('GEMINI_API_KEY', key);
+            localStorage.setItem('GEMINI_BASE_URL', url);
 
             appState.mode = mode;
             showScreen('loading');
 
             try {
                 // Fetch Data
-                const data = await fetchQuizData(appState.apiKey);
+                const data = await fetchQuizData(appState.apiKey, appState.baseUrl);
                 appState.items = data.items;
                 appState.currentIndex = 0;
                 appState.score = 0;
@@ -239,7 +260,11 @@
                 showScreen('quiz');
             } catch (e) {
                 console.error(e);
-                alert("出题失败了：" + e.message + "\n请检查 API Key 是否正确或网络是否通畅。");
+                let msg = "出题失败了：\n" + e.message;
+                if(e.message.includes('403') || e.message.includes('Failed to fetch')) {
+                   msg += "\n\n提示：国内使用可能需要配置代理地址(Base URL)或开启 VPN 全局模式。";
+                }
+                alert(msg);
                 showScreen('welcome');
             }
         };
@@ -249,8 +274,14 @@
         };
 
         // --- GEMINI SERVICE ---
-        async function fetchQuizData(apiKey) {
-            const ai = new GoogleGenAI({ apiKey });
+        async function fetchQuizData(apiKey, baseUrl) {
+            // Configure GenAI options
+            const options = { apiKey };
+            if (baseUrl && baseUrl.length > 0) {
+                options.baseUrl = baseUrl;
+            }
+
+            const ai = new GoogleGenAI(options);
             
             const prompt = `
             Create 10 quiz items for Chinese primary school students (Grades 1-2).

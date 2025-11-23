@@ -17,41 +17,26 @@
     
     <!-- Google Fonts -->
     <style>
-        /* 引入 Quicksand (用于拼音/英文，清晰圆润) 和 Noto Sans SC (用于汉字，笔画清晰) */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&family=Quicksand:wght@500;700&display=swap');
         
-        /* 
-           1. 自定义鼠标样式 (60px 卡通白手套)
-           SVG 绘制了一个可爱的白色填充、黑色描边的手指
-        */
         .cursor-custom {
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" style="fill:white; stroke:black; stroke-width:1.5px; filter:drop-shadow(2px 2px 2px rgba(0,0,0,0.2));"><path d="M5.5 10.5v-6a2.5 2.5 0 0 1 5 0v5.5a.5.5 0 0 0 .5.5h.5a.5.5 0 0 0 .5-.5v-4a2.5 2.5 0 0 1 5 0v4.5a.5.5 0 0 0 .5.5h.5a.5.5 0 0 0 .5-.5v-2a2.5 2.5 0 0 1 5 0v8a8 8 0 0 1-8 8h-4a7 7 0 0 1-7-7v-6.5a2.5 2.5 0 0 1 5 0z" transform="translate(-2, 0) scale(0.9)"/></svg>') 10 0, auto;
         }
 
-        /* 按钮悬停时样式 */
         .cursor-pointer-custom, button, input, a {
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" style="fill:%23ffeb3b; stroke:black; stroke-width:1.5px; filter:drop-shadow(2px 2px 2px rgba(0,0,0,0.2));"><path d="M5.5 10.5v-6a2.5 2.5 0 0 1 5 0v5.5a.5.5 0 0 0 .5.5h.5a.5.5 0 0 0 .5-.5v-4a2.5 2.5 0 0 1 5 0v4.5a.5.5 0 0 0 .5.5h.5a.5.5 0 0 0 .5-.5v-2a2.5 2.5 0 0 1 5 0v8a8 8 0 0 1-8 8h-4a7 7 0 0 1-7-7v-6.5a2.5 2.5 0 0 1 5 0z" transform="translate(-2, 0) scale(0.9)"/></svg>') 10 0, pointer !important;
         }
         
         body {
-            /* 优先使用 Quicksand 显示拼音字母，然后使用 Noto Sans SC 显示汉字 */
             font-family: 'Quicksand', 'Noto Sans SC', system-ui, sans-serif;
             background-color: #fff1f2;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
         
-        .card-shadow {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        }
-
-        .bounce-in {
-            animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        .shake {
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
 
         @keyframes bounceIn {
             0% { transform: scale(0.3); opacity: 0; }
@@ -59,23 +44,18 @@
             70% { transform: scale(0.9); }
             100% { transform: scale(1); }
         }
-
         @keyframes shake {
             10%, 90% { transform: translate3d(-1px, 0, 0); }
             20%, 80% { transform: translate3d(2px, 0, 0); }
             30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
             40%, 60% { transform: translate3d(4px, 0, 0); }
         }
-
-        /* 简单的柱状图动画 */
         .bar-grow {
             animation: growUp 1s ease-out forwards;
             transform-origin: bottom;
             transform: scaleY(0);
         }
-        @keyframes growUp {
-            to { transform: scaleY(1); }
-        }
+        @keyframes growUp { to { transform: scaleY(1); } }
     </style>
 </head>
 <body class="min-h-screen text-slate-800 bg-gradient-to-br from-pink-50 via-white to-sky-50 cursor-custom">
@@ -99,7 +79,6 @@
             </div>
             <!-- Bar Chart -->
             <div id="stats-chart" class="flex items-end justify-between h-20 gap-1 pt-2 px-1">
-                <!-- Bars will be injected by JS -->
                 <div class="w-full h-full flex items-center justify-center text-gray-300 text-xs">加载数据...</div>
             </div>
         </div>
@@ -117,7 +96,7 @@
                 </div>
             </div>
 
-            <!-- Unified Start Button -->
+            <!-- Start Button -->
             <button onclick="startGame()" class="bg-sky-400 hover:bg-sky-500 text-white border-b-4 border-sky-600 font-bold rounded-2xl px-6 py-4 text-2xl active:scale-95 transition-all w-full shadow-lg flex flex-col items-center group">
                 <span class="group-hover:scale-105 transition-transform">🚀 开始挑战</span>
             </button>
@@ -133,36 +112,22 @@
             </div>
         </div>
 
-        <!-- Settings Section (Collapsed by default) -->
+        <!-- Simple Settings Section -->
         <div class="w-full max-w-xs mt-4">
             <button onclick="toggleSettingsPanel()" class="w-full text-center text-xs text-gray-400 font-bold hover:text-sky-500 transition-colors flex items-center justify-center gap-2 mb-2">
-                <span>⚙️ 设置 (API Key & 服务器)</span>
+                <span>⚙️ 设置 (API Key)</span>
                 <span id="settings-arrow">▼</span>
             </button>
 
             <div id="settings-panel" class="hidden space-y-3 bg-white/60 p-4 rounded-3xl border border-pink-100 backdrop-blur-sm shadow-sm transition-all duration-300">
-                <!-- API Key Input -->
                 <div class="space-y-1">
                     <label class="text-[10px] text-gray-400 font-bold ml-2 uppercase">Google API Key</label>
-                    <input type="password" id="api-key-input" placeholder="粘贴你的 API Key" 
+                    <input type="password" id="api-key-input" placeholder="请粘贴 AIza 开头的 Key" 
                         class="w-full px-4 py-2 rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none text-center bg-white/90 font-mono text-sm" />
                 </div>
-
-                <!-- Base URL Input -->
-                <div class="space-y-1">
-                    <label class="text-[10px] text-gray-400 font-bold ml-2 uppercase">服务器地址 (Base URL)</label>
-                    <input type="text" id="base-url-input" placeholder="默认 (空)" 
-                        class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 focus:border-sky-400 focus:outline-none text-center bg-white/90 font-mono text-sm" />
-                    <p class="text-[10px] text-gray-400 leading-tight text-center">国内直连请填代理地址<br>(例如: https://api.laozhang.ai/v1)</p>
-                </div>
-
-                <!-- Model Name Input -->
-                <div class="space-y-1">
-                    <label class="text-[10px] text-gray-400 font-bold ml-2 uppercase">模型名称 (Model Name)</label>
-                    <input type="text" id="model-name-input" placeholder="默认 (Gemini 1.5/2.5)" 
-                        class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 focus:border-sky-400 focus:outline-none text-center bg-white/90 font-mono text-sm" />
-                    <p class="text-[10px] text-gray-400 leading-tight text-center">如代理报错，尝试填 gemini-pro 或 gemini-1.5-pro</p>
-                </div>
+                <p class="text-[10px] text-gray-400 leading-tight text-center">
+                    请确保您的网络环境可以访问 Google (VPN)
+                </p>
             </div>
         </div>
     </div>
@@ -172,7 +137,6 @@
         <div class="w-20 h-20 border-8 border-sky-200 border-t-sky-500 rounded-full animate-spin mb-8"></div>
         <h2 class="text-3xl font-bold text-sky-600 mb-2">正在出题中...</h2>
         <p class="text-gray-400">AI 老师正在准备 <span id="loading-count">10</span> 道题目...</p>
-        <p id="retry-message" class="text-orange-400 text-sm mt-4 hidden font-bold animate-pulse">网络有点卡，正在尝试切换线路...</p>
     </div>
 
     <!-- 3. QUIZ SCREEN -->
@@ -199,15 +163,11 @@
             <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-pink-100 rounded-full opacity-50"></div>
             
             <h2 id="question-instruction" class="text-gray-400 text-lg font-bold mb-2 z-10 tracking-wide">题目</h2>
-            <div id="question-text" class="font-black z-10 text-slate-700 text-8xl transition-all">
-                ?
-            </div>
+            <div id="question-text" class="font-black z-10 text-slate-700 text-8xl transition-all">?</div>
         </div>
 
         <!-- Options -->
-        <div id="options-grid" class="grid grid-cols-2 gap-4 w-full">
-            <!-- Buttons injected by JS -->
-        </div>
+        <div id="options-grid" class="grid grid-cols-2 gap-4 w-full"></div>
     </div>
 
     <!-- 4. FEEDBACK MODAL -->
@@ -231,9 +191,7 @@
 
             <div class="space-y-3 mb-8">
                 <h3 class="text-gray-400 font-bold text-xs uppercase tracking-wider text-center">词语学习</h3>
-                <div id="examples-list" class="space-y-2">
-                    <!-- Examples injected by JS -->
-                </div>
+                <div id="examples-list" class="space-y-2"></div>
             </div>
 
             <button onclick="nextQuestion()" class="bg-sky-400 hover:bg-sky-500 text-white border-b-4 border-sky-600 font-bold rounded-2xl px-6 py-3 text-xl w-full active:scale-95 transition-all shadow-md">
@@ -256,10 +214,7 @@
                 <p class="font-bold">太棒了！<br>暂时没有错题哦！</p>
             </div>
 
-            <!-- List -->
-            <div id="mistake-list" class="flex-1 overflow-y-auto space-y-2 pr-2 mb-4">
-                <!-- Items injected here -->
-            </div>
+            <div id="mistake-list" class="flex-1 overflow-y-auto space-y-2 pr-2 mb-4"></div>
 
             <button id="btn-review-mistakes" onclick="startReviewGame()" class="bg-orange-400 hover:bg-orange-500 text-white border-b-4 border-orange-600 font-bold rounded-2xl px-6 py-3 text-lg w-full active:scale-95 transition-all hidden shadow-md">
                 ✍️ 开始复习这些字
@@ -291,28 +246,24 @@
 
     <!-- LOGIC SCRIPT -->
     <script type="module">
-        // Removed top-level import to prevent blocking in China
-        // import { GoogleGenAI } from "@google/genai"; 
-
         // --- STATE ---
         let appState = {
             items: [], 
             currentIndex: 0,
             score: 0,
-            targetCount: 10, // Default 10 questions
+            targetCount: 10,
             apiKey: localStorage.getItem('GEMINI_API_KEY') || '',
-            baseUrl: localStorage.getItem('GEMINI_BASE_URL') || '',
-            modelName: localStorage.getItem('GEMINI_MODEL_NAME') || ''
+            isReview: false
         };
 
         // --- STORAGE KEYS ---
-        const MASTERY_KEY = 'HANZI_MASTERY_LIST'; // Used for prompt exclusion (Last 100)
+        const MASTERY_KEY = 'HANZI_MASTERY_LIST';
         const MISTAKE_KEY = 'HANZI_MISTAKES_LIST';
-        const TOTAL_MASTERY_KEY = 'HANZI_TOTAL_MASTERY_SET'; // Full unique set of mastered chars
-        const DAILY_STATS_KEY = 'HANZI_DAILY_STATS_LOG'; // Date -> Count map
+        const TOTAL_MASTERY_KEY = 'HANZI_TOTAL_MASTERY_SET';
+        const DAILY_STATS_KEY = 'HANZI_DAILY_STATS_LOG';
         const MAX_MASTERY_SIZE = 100;
 
-        // --- HELPER: Dates ---
+        // --- HELPERS ---
         function getTodayStr() {
             const d = new Date();
             const year = d.getFullYear();
@@ -321,156 +272,43 @@
             return `${year}-${month}-${day}`;
         }
 
-        // --- MASTERY & STATS LOGIC ---
+        // --- STORAGE LOGIC ---
         function getRecentMastery() {
             try { return JSON.parse(localStorage.getItem(MASTERY_KEY) || '[]'); } catch (e) { return []; }
         }
-
         function getTotalMasterySet() {
             try { return new Set(JSON.parse(localStorage.getItem(TOTAL_MASTERY_KEY) || '[]')); } catch (e) { return new Set(); }
         }
-
         function getDailyStats() {
             try { return JSON.parse(localStorage.getItem(DAILY_STATS_KEY) || '{}'); } catch (e) { return {}; }
         }
+        function getMistakes() {
+            try { return JSON.parse(localStorage.getItem(MISTAKE_KEY) || '[]'); } catch (e) { return []; }
+        }
 
         function saveMasteryAndStats(char) {
-            // 1. Update Total Mastery (Unique Count) & Daily Log
             const totalSet = getTotalMasterySet();
             const dailyStats = getDailyStats();
             const today = getTodayStr();
 
             if (!totalSet.has(char)) {
-                // New word learned!
                 totalSet.add(char);
                 localStorage.setItem(TOTAL_MASTERY_KEY, JSON.stringify([...totalSet]));
-
-                // Update daily count
                 dailyStats[today] = (dailyStats[today] || 0) + 1;
                 localStorage.setItem(DAILY_STATS_KEY, JSON.stringify(dailyStats));
             }
 
-            // 2. Update Recent Mastery (for Prompt Exclusion - LRU style)
             let recentList = getRecentMastery();
             recentList = recentList.filter(c => c !== char);
             recentList.push(char);
             if (recentList.length > MAX_MASTERY_SIZE) recentList = recentList.slice(recentList.length - MAX_MASTERY_SIZE);
             localStorage.setItem(MASTERY_KEY, JSON.stringify(recentList));
-
             updateStatsUI();
-        }
-
-        window.clearAllData = () => {
-            if(confirm('警告：确定要重置所有识字记录、错题本和统计数据吗？')) {
-                localStorage.removeItem(MASTERY_KEY);
-                localStorage.removeItem(MISTAKE_KEY);
-                localStorage.removeItem(TOTAL_MASTERY_KEY);
-                localStorage.removeItem(DAILY_STATS_KEY);
-                alert("数据已重置");
-                updateStatsUI();
-                openMistakeModal(); // Force refresh of mistake UI state if open, or just ensure UI sync
-                closeMistakeModal();
-            }
-        }
-
-        // --- UI: STATS CHART ---
-        function updateStatsUI() {
-            // Update Mistake Badge
-            const mistakeList = getMistakes();
-            const elBadge = document.getElementById('mistake-badge-main');
-            if (elBadge) {
-                if (mistakeList.length > 0) {
-                    elBadge.innerText = mistakeList.length;
-                    elBadge.classList.remove('hidden');
-                } else {
-                    elBadge.classList.add('hidden');
-                }
-            }
-
-            // Update Total Count
-            const totalSet = getTotalMasterySet();
-            const elTotal = document.getElementById('stat-total-count');
-            if(elTotal) elTotal.innerText = totalSet.size;
-
-            // Render Chart
-            renderChart();
-        }
-
-        function renderChart() {
-            const chartContainer = document.getElementById('stats-chart');
-            if(!chartContainer) return;
-            chartContainer.innerHTML = '';
-
-            const dailyStats = getDailyStats();
-            const days = 7;
-            const dataPoints = [];
-            let maxVal = 0;
-
-            // Generate last 7 days data
-            for (let i = days - 1; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                const dateStr = `${year}-${month}-${day}`;
-                const displayDate = `${month}/${day}`;
-                
-                const count = dailyStats[dateStr] || 0;
-                if(count > maxVal) maxVal = count;
-                dataPoints.push({ date: displayDate, count: count, fullDate: dateStr });
-            }
-
-            if (maxVal === 0) maxVal = 5; // Min scale
-
-            // Create Bars
-            dataPoints.forEach((pt, idx) => {
-                const heightPercent = Math.max(15, (pt.count / maxVal) * 100); // Min height for visibility
-                const isToday = pt.fullDate === getTodayStr();
-                
-                const col = document.createElement('div');
-                // FIXED: Changed w-1/7 to flex-1 for proper width distribution
-                col.className = "flex-1 flex flex-col items-center justify-end h-full group relative";
-                
-                // Tooltip
-                col.innerHTML = `
-                    <div class="absolute -top-8 bg-slate-700 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                        ${pt.count} 字
-                    </div>
-                    <div class="w-3 md:w-4 rounded-t-md ${isToday ? 'bg-sky-400' : 'bg-pink-200'} bar-grow relative" style="height: ${heightPercent}%; animation-delay: ${idx * 0.1}s">
-                         ${pt.count > 0 ? `<div class="absolute -top-4 w-full text-center text-[9px] text-gray-400 font-bold">${pt.count}</div>` : ''}
-                    </div>
-                    <div class="text-[9px] text-gray-400 mt-1 scale-90">${pt.date}</div>
-                `;
-                chartContainer.appendChild(col);
-            });
-        }
-
-        // --- QUESTION COUNT SELECTOR ---
-        window.setQCount = (n) => {
-            appState.targetCount = n;
-            // Update UI
-            [10, 20, 30].forEach(val => {
-                const btn = document.getElementById(`btn-count-${val}`);
-                if (val === n) {
-                    btn.className = "flex-1 py-1 px-3 rounded-lg text-sm font-bold transition-all bg-white text-sky-500 shadow-sm";
-                } else {
-                    btn.className = "flex-1 py-1 px-3 rounded-lg text-sm font-bold text-gray-400 hover:text-gray-600 transition-all";
-                }
-            });
-            playSound('click');
-        };
-
-        // --- MISTAKE BANK LOGIC ---
-        function getMistakes() {
-            try { return JSON.parse(localStorage.getItem(MISTAKE_KEY) || '[]'); } catch (e) { return []; }
         }
 
         function addToMistakes(item) {
             let list = getMistakes();
-            // Avoid duplicates
             if (!list.find(i => i.character === item.character)) {
-                // Ensure we save a clean item without the temporary mode property
                 const cleanItem = {
                     character: item.character,
                     pinyin: item.pinyin,
@@ -491,12 +329,91 @@
             if (list.length !== initialLength) {
                 localStorage.setItem(MISTAKE_KEY, JSON.stringify(list));
                 updateStatsUI();
-                return true; // Indicates it was removed
+                return true;
             }
             return false;
         }
 
-        // --- DOM ELEMENTS ---
+        window.clearAllData = () => {
+            if(confirm('警告：确定要重置所有识字记录、错题本和统计数据吗？')) {
+                localStorage.removeItem(MASTERY_KEY);
+                localStorage.removeItem(MISTAKE_KEY);
+                localStorage.removeItem(TOTAL_MASTERY_KEY);
+                localStorage.removeItem(DAILY_STATS_KEY);
+                alert("数据已重置");
+                updateStatsUI();
+                openMistakeModal();
+                closeMistakeModal();
+            }
+        }
+
+        // --- UI UPDATES ---
+        function updateStatsUI() {
+            const mistakeList = getMistakes();
+            const elBadge = document.getElementById('mistake-badge-main');
+            if (elBadge) {
+                if (mistakeList.length > 0) {
+                    elBadge.innerText = mistakeList.length;
+                    elBadge.classList.remove('hidden');
+                } else {
+                    elBadge.classList.add('hidden');
+                }
+            }
+            const totalSet = getTotalMasterySet();
+            const elTotal = document.getElementById('stat-total-count');
+            if(elTotal) elTotal.innerText = totalSet.size;
+            renderChart();
+        }
+
+        function renderChart() {
+            const chartContainer = document.getElementById('stats-chart');
+            if(!chartContainer) return;
+            chartContainer.innerHTML = '';
+            const dailyStats = getDailyStats();
+            const days = 7;
+            let maxVal = 0;
+            const dataPoints = [];
+
+            for (let i = days - 1; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const dateStr = `${d.getFullYear()}-${month}-${day}`;
+                const count = dailyStats[dateStr] || 0;
+                if(count > maxVal) maxVal = count;
+                dataPoints.push({ date: `${month}/${day}`, count, fullDate: dateStr });
+            }
+            if (maxVal === 0) maxVal = 5;
+
+            dataPoints.forEach((pt, idx) => {
+                const heightPercent = Math.max(15, (pt.count / maxVal) * 100);
+                const isToday = pt.fullDate === getTodayStr();
+                const col = document.createElement('div');
+                col.className = "flex-1 flex flex-col items-center justify-end h-full group relative";
+                col.innerHTML = `
+                    <div class="absolute -top-8 bg-slate-700 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">${pt.count} 字</div>
+                    <div class="w-3 md:w-4 rounded-t-md ${isToday ? 'bg-sky-400' : 'bg-pink-200'} bar-grow relative" style="height: ${heightPercent}%; animation-delay: ${idx * 0.1}s">
+                         ${pt.count > 0 ? `<div class="absolute -top-4 w-full text-center text-[9px] text-gray-400 font-bold">${pt.count}</div>` : ''}
+                    </div>
+                    <div class="text-[9px] text-gray-400 mt-1 scale-90">${pt.date}</div>
+                `;
+                chartContainer.appendChild(col);
+            });
+        }
+
+        window.setQCount = (n) => {
+            appState.targetCount = n;
+            [10, 20, 30].forEach(val => {
+                const btn = document.getElementById(`btn-count-${val}`);
+                btn.className = (val === n) 
+                    ? "flex-1 py-1 px-3 rounded-lg text-sm font-bold transition-all bg-white text-sky-500 shadow-sm"
+                    : "flex-1 py-1 px-3 rounded-lg text-sm font-bold text-gray-400 hover:text-gray-600 transition-all";
+            });
+            playSound('click');
+        };
+
+        // --- NAVIGATION & DOM ---
         const screens = {
             welcome: document.getElementById('screen-welcome'),
             loading: document.getElementById('screen-loading'),
@@ -508,55 +425,30 @@
             mistakes: document.getElementById('modal-mistakes')
         };
         const inputKey = document.getElementById('api-key-input');
-        const inputBaseUrl = document.getElementById('base-url-input');
-        const inputModelName = document.getElementById('model-name-input');
 
-        // Init
         if (appState.apiKey) inputKey.value = appState.apiKey;
-        if (appState.baseUrl) inputBaseUrl.value = appState.baseUrl;
-        if (appState.modelName) inputModelName.value = appState.modelName;
-        
-        // Initial Stats Render
         updateStatsUI();
-        // Initial Count UI
         window.setQCount(10); 
 
-        // --- NAVIGATION ---
         function showScreen(name) {
             Object.values(screens).forEach(el => el.classList.add('hidden'));
             if(screens[name]) screens[name].classList.remove('hidden');
-            
-            // Reset retry message on loading screen
-            if (name === 'loading') {
-                 document.getElementById('retry-message').classList.add('hidden');
-            }
         }
 
-        window.goHome = () => {
-            playSound('click');
-            showScreen('welcome');
-            updateStatsUI(); // Refresh stats when returning home
-        };
-
+        window.goHome = () => { playSound('click'); showScreen('welcome'); updateStatsUI(); };
         window.toggleSettingsPanel = () => {
             const el = document.getElementById('settings-panel');
-            const arrow = document.getElementById('settings-arrow');
             el.classList.toggle('hidden');
-            if (el.classList.contains('hidden')) {
-                arrow.innerText = '▼';
-            } else {
-                arrow.innerText = '▲';
-            }
+            document.getElementById('settings-arrow').innerText = el.classList.contains('hidden') ? '▼' : '▲';
         };
 
-        // --- MISTAKE UI HANDLERS ---
+        // --- MISTAKE UI ---
         window.openMistakeModal = () => {
             playSound('click');
             const list = getMistakes();
             const container = document.getElementById('mistake-list');
             const emptyState = document.getElementById('mistake-empty-state');
             const btnReview = document.getElementById('btn-review-mistakes');
-            
             container.innerHTML = '';
 
             if (list.length === 0) {
@@ -565,135 +457,88 @@
             } else {
                 emptyState.classList.add('hidden');
                 btnReview.classList.remove('hidden');
-                
                 list.forEach(item => {
                     const row = document.createElement('div');
                     row.className = "flex items-center justify-between bg-orange-50 p-3 rounded-xl border border-orange-100";
-                    row.innerHTML = `
-                        <div class="flex items-center gap-3">
+                    row.innerHTML = `<div class="flex items-center gap-3">
                             <span class="text-3xl font-black text-orange-600 bg-white w-12 h-12 flex items-center justify-center rounded-lg shadow-sm border border-orange-200 font-sans">${item.character}</span>
                             <span class="text-lg font-bold text-gray-600 font-sans">${item.pinyin}</span>
-                        </div>
-                    `;
+                        </div>`;
                     container.appendChild(row);
                 });
             }
-
             modals.mistakes.classList.remove('hidden');
-        }
-
-        window.closeMistakeModal = () => {
-            playSound('click');
-            modals.mistakes.classList.add('hidden');
-        }
+        };
+        window.closeMistakeModal = () => { playSound('click'); modals.mistakes.classList.add('hidden'); };
 
         window.startReviewGame = () => {
             const list = getMistakes();
             if (list.length === 0) return;
-            
             window.closeMistakeModal();
             playSound('start');
-            
-            // Setup Review Mode
-            // Shuffle mistakes
             let items = [...list].sort(() => Math.random() - 0.5);
-            // Limit to targetCount if needed, but for mistakes usually we review all or batch
-            // Let's limit to the selected targetCount for consistency, or 10 if too many
             const limit = appState.targetCount || 10;
             if (items.length > limit) items = items.slice(0, limit);
-            
-            // Assign random mode to each review item
             items.forEach(item => {
                 item.mode = Math.random() < 0.5 ? 'HANZI_TO_PINYIN' : 'PINYIN_TO_HANZI';
             });
-            
             appState.items = items;
             appState.currentIndex = 0;
             appState.score = 0;
             appState.isReview = true; 
-            
             renderQuestion();
             showScreen('quiz');
-        }
+        };
 
-        // --- GAME START LOGIC (API) ---
+        // --- GAME LOGIC ---
         window.startGame = async () => {
             initAudio(); 
             playSound('start');
             appState.isReview = false;
-
             const key = inputKey.value.trim();
-            const url = inputBaseUrl.value.trim();
-            const model = inputModelName.value.trim();
-            
             if (!key) {
                 const el = document.getElementById('settings-panel');
-                if(el.classList.contains('hidden')) {
-                    window.toggleSettingsPanel();
-                }
+                if(el.classList.contains('hidden')) window.toggleSettingsPanel();
                 el.classList.add('shake');
                 setTimeout(() => el.classList.remove('shake'), 500);
                 inputKey.focus();
                 return;
             }
-            
             appState.apiKey = key;
-            appState.baseUrl = url;
-            appState.modelName = model;
-
             localStorage.setItem('GEMINI_API_KEY', key);
-            localStorage.setItem('GEMINI_BASE_URL', url);
-            localStorage.setItem('GEMINI_MODEL_NAME', model);
 
             showScreen('loading');
             document.getElementById('loading-count').innerText = appState.targetCount;
 
             try {
-                const mastered = getRecentMastery(); // Only send recent 100 to API
-                const data = await fetchQuizData(appState.apiKey, appState.baseUrl, appState.modelName, mastered, appState.targetCount);
-                
-                // Randomly assign mode to each item
+                const mastered = getRecentMastery(); 
+                const data = await fetchQuizData(appState.apiKey, mastered, appState.targetCount);
                 data.items.forEach(item => {
                     item.mode = Math.random() < 0.5 ? 'HANZI_TO_PINYIN' : 'PINYIN_TO_HANZI';
                 });
-
                 appState.items = data.items;
                 appState.currentIndex = 0;
                 appState.score = 0;
-                
                 renderQuestion();
                 showScreen('quiz');
             } catch (e) {
                 console.error(e);
-                let msg = "出题失败了 (T_T)\n" + e.message;
-                if(e.message.includes('403') || e.message.includes('Failed to fetch') || e.message.includes('503') || e.message.includes('Proxy Error') || e.message.includes('SDK')) {
-                   msg += "\n\n💡 提示：\n1. 请检查网络连通性。\n2. 尝试在设置中填入 'gemini-1.5-pro'。\n3. 如果在国内，请使用代理(sk-开头)或全局VPN。";
-                }
-                alert(msg);
+                alert("出题失败！请检查您的网络是否开启了 VPN (Global Mode)。\n\n错误信息: " + e.message);
                 showScreen('welcome');
             }
         };
 
         window.replayGame = () => {
-            if (appState.isReview) {
-                const list = getMistakes();
-                if (list.length > 0) {
-                    window.startReviewGame();
-                } else {
-                    alert("错题全部复习完啦！真棒！");
-                    goHome();
-                }
-            } else {
-                window.startGame();
-            }
+            if (appState.isReview && getMistakes().length > 0) window.startReviewGame();
+            else if (appState.isReview) { alert("错题全部复习完啦！"); goHome(); }
+            else window.startGame();
         };
 
-        // --- GEMINI SERVICE ---
-        async function fetchQuizData(apiKey, baseUrl, modelName, excludedChars, qCount = 10) {
+        async function fetchQuizData(apiKey, excludedChars, qCount = 10) {
             const excludedStr = excludedChars.slice(-50).join(', ');
             const promptText = `
             Create ${qCount} quiz items for Chinese primary school students (Grades 1-2).
-            **IMPORTANT**: Exclude these chars: [${excludedStr}]. Choose different simple ones.
+            IMPORTANT: Do NOT use these characters: [${excludedStr}]. Pick different simple ones.
             Format: JSON.
             Structure:
             {
@@ -712,137 +557,49 @@
               ]
             }`;
 
-            // --- STRATEGY 1: OpenAI Compatible Proxy (for sk- keys) ---
-            if (apiKey.startsWith('sk-')) {
-                // Ensure URL ends correctly for OpenAI format
-                let url = baseUrl;
-                if (!url) throw new Error("使用 sk- 开头的 Key 必须填写服务器地址 (Base URL)");
-                
-                // Normalize URL
-                if (url.endsWith('/')) url = url.slice(0, -1);
-                
-                // Append /chat/completions if not present
-                if (!url.endsWith('/chat/completions')) {
-                    url = `${url}/chat/completions`;
-                }
-
-                // Helper to fetch with a specific model
-                const doFetch = async (targetModel) => {
-                     const response = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        },
-                        body: JSON.stringify({
-                            model: targetModel,
-                            messages: [
-                                { role: "system", content: "You are a helpful JSON generator." },
-                                { role: "user", content: promptText }
-                            ],
-                            temperature: 0.7
-                        })
-                    });
-
-                    if (!response.ok) {
-                         const errText = await response.text();
-                         throw new Error(`Proxy Error (${response.status}): ${errText}`);
-                    }
-                    return response.json();
-                };
-
-                // Default to gemini-1.5-flash if modelName is not provided
-                let initialModel = modelName || "gemini-1.5-flash";
-                
-                try {
-                    // 1. Try Initial Model
-                    const data = await doFetch(initialModel);
-                    
-                    const content = data.choices?.[0]?.message?.content;
-                    if (!content) throw new Error("No content received from proxy");
-                    const jsonStr = content.replace(/```json/g, '').replace(/```/g, '').trim();
-                    return JSON.parse(jsonStr);
-
-                } catch (error) {
-                    // 2. RETRY LOGIC
-                    // If the user didn't specify a custom model, and the default flash model failed...
-                    if (!modelName && error.message.includes('Proxy Error')) {
-                        console.warn(`Model ${initialModel} failed. Retrying with gemini-pro...`);
-                        
-                        // Show retry message on UI
-                        const retryMsg = document.getElementById('retry-message');
-                        if(retryMsg) retryMsg.classList.remove('hidden');
-
-                        try {
-                            const data = await doFetch("gemini-pro");
-                            const content = data.choices?.[0]?.message?.content;
-                            if (!content) throw new Error("No content received from proxy (retry)");
-                            const jsonStr = content.replace(/```json/g, '').replace(/```/g, '').trim();
-                            return JSON.parse(jsonStr);
-                        } catch (retryError) {
-                            // If retry also fails, throw original error or new error
-                            throw new Error(error.message + "\n(自动切换 gemini-pro 重试也失败了)");
-                        }
-                    } else {
-                        throw error;
-                    }
-                }
-            }
-
-            // --- STRATEGY 2: Google Official SDK (for AIza keys) ---
-            // DYNAMIC IMPORT to prevent blocking in China if using Proxy
+            // --- STRICTLY GOOGLE SDK LOGIC ---
             let GoogleGenAI;
             try {
+                // Dynamic import to prevent initial load blocking
                 const module = await import("https://esm.run/@google/genai");
                 GoogleGenAI = module.GoogleGenAI;
             } catch (e) {
-                throw new Error("无法加载 Google SDK。如果是国内环境，请使用 sk- 开头的代理 Key，或开启全局代理。");
+                throw new Error("无法加载 Google AI SDK。请确保网络畅通 (VPN)。");
             }
 
-            const options = { apiKey };
-            if (baseUrl && baseUrl.length > 0) options.baseUrl = baseUrl;
-
-            // Default to gemini-2.5-flash if modelName is not provided for SDK
-            const targetModel = modelName || "gemini-2.5-flash";
-
-            const ai = new GoogleGenAI(options);
+            const ai = new GoogleGenAI({ apiKey });
+            // Using gemini-2.5-flash as default official model
             const response = await ai.models.generateContent({
-                model: targetModel,
+                model: 'gemini-2.5-flash',
                 contents: promptText,
                 config: { responseMimeType: "application/json" }
             });
+            
+            if(!response || !response.text) throw new Error("API 返回为空");
             return JSON.parse(response.text);
         }
 
-        // --- RENDER GAME ---
+        // --- RENDER & ANSWER HANDLERS ---
         function renderQuestion() {
             const item = appState.items[appState.currentIndex];
-            // Determine mode from item property. Default to HANZI_TO_PINYIN if missing.
             const isHanziMode = (item.mode === 'HANZI_TO_PINYIN');
-
-            // Update Header
             document.getElementById('current-q-num').innerText = appState.currentIndex + 1;
             document.getElementById('total-q-num').innerText = appState.items.length;
             document.getElementById('progress-bar').style.width = `${((appState.currentIndex) / appState.items.length) * 100}%`;
-
-            // Update Card
             document.getElementById('question-instruction').innerText = isHanziMode ? "请选择正确的拼音" : "请选择对应的汉字";
+            
             const qText = document.getElementById('question-text');
             qText.innerText = isHanziMode ? item.character : item.pinyin;
-            
-            // Adjust font size for pinyin vs hanzi
             qText.className = isHanziMode 
                 ? "font-black z-10 text-slate-700 text-8xl transition-all" 
                 : "font-bold z-10 text-slate-700 text-6xl transition-all font-sans";
 
-            // Options
             const correct = isHanziMode ? item.pinyin : item.character;
             const wrongs = isHanziMode ? item.wrongPinyins : item.wrongChars;
             const options = [...wrongs, correct].sort(() => Math.random() - 0.5);
 
             const grid = document.getElementById('options-grid');
             grid.innerHTML = ''; 
-
             options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = "bg-white hover:bg-sky-50 hover:text-sky-600 hover:border-sky-300 text-slate-600 border-2 border-slate-200 font-bold rounded-2xl h-20 text-3xl shadow-sm active:scale-95 transition-all font-sans";
@@ -854,24 +611,20 @@
 
         function handleAnswer(selected, correct, item) {
             const isCorrect = selected === correct;
-            let removedFromMistakes = false;
-
+            let removed = false;
             if (isCorrect) {
                 appState.score++;
                 playSound('correct');
                 saveMasteryAndStats(item.character);
-                // Important: Remove from mistakes if correct!
-                removedFromMistakes = removeFromMistakes(item.character);
+                removed = removeFromMistakes(item.character);
             } else {
                 playSound('wrong');
-                // Add to mistakes if wrong!
                 addToMistakes(item);
             }
-
-            showFeedback(isCorrect, removedFromMistakes);
+            showFeedback(isCorrect, removed);
         }
 
-        function showFeedback(isCorrect, removedFromMistakes) {
+        function showFeedback(isCorrect, removed) {
             const item = appState.items[appState.currentIndex];
             const title = document.getElementById('feedback-title');
             const iconBg = document.getElementById('feedback-icon-bg');
@@ -882,21 +635,15 @@
                 title.className = "text-3xl font-bold mb-2 text-green-500";
                 iconBg.className = "rounded-full p-4 border-4 border-white shadow-lg bg-green-400";
                 icon.innerText = "🌟";
-                
-                if (removedFromMistakes) {
-                    title.innerHTML += "<br><span class='text-sm text-orange-400'>已从错题本移出!</span>";
-                }
-
+                if (removed) title.innerHTML += "<br><span class='text-sm text-orange-400'>已从错题本移出!</span>";
             } else {
                 title.innerText = "记入错题本！";
                 title.className = "text-3xl font-bold mb-2 text-orange-500";
                 iconBg.className = "rounded-full p-4 border-4 border-white shadow-lg bg-orange-400";
                 icon.innerText = "📝";
             }
-
             document.getElementById('fb-char').innerText = item.character;
             document.getElementById('fb-pinyin').innerText = item.pinyin;
-
             const list = document.getElementById('examples-list');
             list.innerHTML = '';
             item.examples.forEach(ex => {
@@ -905,14 +652,12 @@
                 row.innerHTML = `<span class="text-lg font-bold text-amber-800 font-sans">${ex.word}</span><span class="text-md text-amber-600 font-mono font-bold">${ex.pinyin}</span>`;
                 list.appendChild(row);
             });
-
             modals.feedback.classList.remove('hidden');
         }
 
         window.nextQuestion = () => {
             modals.feedback.classList.add('hidden');
             playSound('click');
-            
             if (appState.currentIndex < appState.items.length - 1) {
                 appState.currentIndex++;
                 renderQuestion();
@@ -924,29 +669,24 @@
         function finishGame() {
             setTimeout(() => playSound('victory'), 300);
             showScreen('finished');
-            
             document.getElementById('final-total').innerText = appState.items.length;
             document.getElementById('final-score').innerText = appState.score;
             document.getElementById('final-points').innerText = appState.score * 10;
-
             const percent = (appState.score / appState.items.length) * 100;
-            let emoji = '😐'; 
-            let title = '完成!';
-            
+            let emoji = '😐'; let title = '完成!';
             if(percent === 100) { emoji='🏆'; title='满分! 太棒了!'; }
             else if(percent >= 80) { emoji='🎉'; title='非常优秀!'; }
             else if(percent >= 60) { emoji='👍'; title='继续加油!'; }
-
             document.getElementById('final-emoji').innerText = emoji;
             document.getElementById('final-title').innerText = title;
         }
 
-        // --- AUDIO SERVICE (Vanilla) ---
+        // --- AUDIO ---
         let audioCtx = null;
         window.initAudio = () => {
             if (!audioCtx) {
-                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                if (AudioContextClass) audioCtx = new AudioContext();
+                const AC = window.AudioContext || window.webkitAudioContext;
+                if (AC) audioCtx = new AC();
             }
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         };
@@ -955,63 +695,35 @@
             if (!audioCtx) window.initAudio();
             if (!audioCtx) return;
             const t = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
             
             if (type === 'click') {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, t);
-                osc.frequency.exponentialRampToValueAtTime(1000, t + 0.08);
-                gain.gain.setValueAtTime(0.05, t);
-                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(t); osc.stop(t + 0.08);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, t); osc.frequency.exponentialRampToValueAtTime(1000, t+0.08);
+                gain.gain.setValueAtTime(0.05, t); gain.gain.exponentialRampToValueAtTime(0.001, t+0.08);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.08);
             } else if (type === 'correct') {
                 [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(f, t);
-                    const st = t + i * 0.08;
-                    gain.gain.setValueAtTime(0, st);
-                    gain.gain.linearRampToValueAtTime(0.05, st + 0.02);
-                    gain.gain.exponentialRampToValueAtTime(0.001, st + 0.4);
-                    osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.start(st); osc.stop(st + 0.5);
+                    const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = 'triangle';
+                    o.frequency.setValueAtTime(f, t);
+                    g.gain.setValueAtTime(0, t+i*0.08); g.gain.linearRampToValueAtTime(0.05, t+i*0.08+0.02); g.gain.exponentialRampToValueAtTime(0.001, t+i*0.08+0.4);
+                    o.connect(g); g.connect(audioCtx.destination); o.start(t+i*0.08); o.stop(t+i*0.08+0.5);
                 });
             } else if (type === 'wrong') {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, t);
-                osc.frequency.linearRampToValueAtTime(100, t + 0.3);
-                gain.gain.setValueAtTime(0.05, t);
-                gain.gain.linearRampToValueAtTime(0, t + 0.3);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(t); osc.stop(t + 0.3);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, t); osc.frequency.linearRampToValueAtTime(100, t+0.3);
+                gain.gain.setValueAtTime(0.05, t); gain.gain.linearRampToValueAtTime(0, t+0.3);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.3);
             } else if (type === 'victory') {
                 [523, 659, 783, 1046, 1318, 1567].forEach((f, i) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'square';
-                    const st = t + i * 0.08;
-                    osc.frequency.setValueAtTime(f, st);
-                    gain.gain.setValueAtTime(0, st);
-                    gain.gain.linearRampToValueAtTime(0.04, st + 0.05);
-                    gain.gain.exponentialRampToValueAtTime(0.001, st + 0.3);
-                    osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.start(st); osc.stop(st + 0.4);
+                    const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = 'square';
+                    o.frequency.setValueAtTime(f, t+i*0.08);
+                    g.gain.setValueAtTime(0, t+i*0.08); g.gain.linearRampToValueAtTime(0.04, t+i*0.08+0.05); g.gain.exponentialRampToValueAtTime(0.001, t+i*0.08+0.3);
+                    o.connect(g); g.connect(audioCtx.destination); o.start(t+i*0.08); o.stop(t+i*0.08+0.4);
                 });
             } else if (type === 'start') {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.frequency.setValueAtTime(200, t);
-                osc.frequency.exponentialRampToValueAtTime(800, t + 0.3);
-                gain.gain.setValueAtTime(0, t);
-                gain.gain.linearRampToValueAtTime(0.08, t + 0.1);
-                gain.gain.linearRampToValueAtTime(0, t + 0.3);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(t); osc.stop(t + 0.3);
+                osc.frequency.setValueAtTime(200, t); osc.frequency.exponentialRampToValueAtTime(800, t+0.3);
+                gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.08, t+0.1); gain.gain.linearRampToValueAtTime(0, t+0.3);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.3);
             }
         };
     </script>

@@ -7,7 +7,7 @@
     <meta name="description" content="绵绵识字 - 儿童趣味汉字测试">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="绵绵识字">
-    <title>绵绵识字 - 趣味闯关</title>
+    <title>绵绵识字</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
@@ -49,11 +49,22 @@
             animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
         @keyframes bounceIn {
             0% { transform: scale(0.3); opacity: 0; }
             50% { transform: scale(1.05); opacity: 1; }
             70% { transform: scale(0.9); }
             100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
         }
     </style>
 
@@ -70,38 +81,14 @@
 
     <!-- 1. WELCOME SCREEN -->
     <div id="screen-welcome" class="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-6">
-        <div class="space-y-2">
+        <div class="space-y-2 mb-4">
             <div class="text-7xl animate-bounce">🐼</div>
             <h1 class="text-6xl font-black text-sky-500 tracking-wider drop-shadow-sm">绵绵识字</h1>
             <p class="text-xl text-gray-500 font-bold">和 AI 老师一起挑战汉字！</p>
         </div>
         
-        <!-- Settings Area -->
-        <div class="w-full max-w-xs space-y-3 bg-white/50 p-4 rounded-3xl border border-pink-100">
-            <!-- API Key Input -->
-            <div class="space-y-1">
-                <label class="text-xs text-gray-400 font-bold ml-2">API Key</label>
-                <input type="password" id="api-key-input" placeholder="粘贴你的 API Key" 
-                    class="w-full px-4 py-2 rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none text-center bg-white/80 font-mono" />
-            </div>
-
-            <!-- Settings Toggle -->
-            <button onclick="toggleSettings()" class="w-full text-center text-xs text-gray-400 font-bold hover:text-sky-500 transition-colors flex items-center justify-center gap-1">
-                <span>⚙️ 高级设置 (Server URL)</span>
-                <span id="settings-arrow">▼</span>
-            </button>
-
-            <!-- Base URL Input (Hidden by default) -->
-            <div id="advanced-settings" class="hidden space-y-1 pt-2 border-t border-gray-100">
-                <label class="text-xs text-gray-400 font-bold ml-2">服务器地址 (Base URL)</label>
-                <input type="text" id="base-url-input" placeholder="默认 (空)" 
-                    class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 focus:border-sky-400 focus:outline-none text-center bg-white/80 text-sm font-mono" />
-                <p class="text-[10px] text-gray-400 leading-tight">国内直连请填代理地址<br>例如: https://你的中转域名/gemini</p>
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-4 w-full max-w-xs pt-2">
-            <!-- Game Mode Buttons -->
+        <!-- Game Mode Buttons (Prominent) -->
+        <div class="flex flex-col gap-4 w-full max-w-xs z-10">
             <button onclick="startGame('HANZI_TO_PINYIN')" class="bg-sky-400 hover:bg-sky-500 text-white border-b-4 border-sky-600 font-bold rounded-2xl px-6 py-4 text-xl active:scale-95 transition-all w-full shadow-lg">
                 看字选音 <span class="text-sm opacity-80 ml-2 font-normal">(汉 ➔ pin)</span>
             </button>
@@ -115,12 +102,35 @@
                 <span id="mistake-badge-main" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white hidden">0</span>
             </button>
 
-            <div class="text-xs text-gray-400 pt-2">
-                已学会 <span id="mastery-count" class="font-bold text-green-500">0</span> 个汉字 (智能过滤)
+            <div class="text-xs text-gray-400 pt-2 flex justify-between items-center px-2">
+                <span>已学会 <span id="mastery-count" class="font-bold text-green-500">0</span> 个汉字</span>
+                <button onclick="clearMastery()" class="text-red-300 underline hover:text-red-400">重置</button>
             </div>
-            <button onclick="clearMastery()" class="text-xs text-red-300 underline hover:text-red-400">
-                重置学习记录
+        </div>
+
+        <!-- Settings Section (Collapsed by default) -->
+        <div class="w-full max-w-xs mt-8">
+            <button onclick="toggleSettingsPanel()" class="w-full text-center text-xs text-gray-400 font-bold hover:text-sky-500 transition-colors flex items-center justify-center gap-2 mb-2">
+                <span>⚙️ 设置 (API Key & 服务器)</span>
+                <span id="settings-arrow">▼</span>
             </button>
+
+            <div id="settings-panel" class="hidden space-y-3 bg-white/60 p-4 rounded-3xl border border-pink-100 backdrop-blur-sm shadow-sm transition-all duration-300">
+                <!-- API Key Input -->
+                <div class="space-y-1">
+                    <label class="text-[10px] text-gray-400 font-bold ml-2 uppercase">Google API Key</label>
+                    <input type="password" id="api-key-input" placeholder="粘贴你的 API Key" 
+                        class="w-full px-4 py-2 rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none text-center bg-white/90 font-mono text-sm" />
+                </div>
+
+                <!-- Base URL Input -->
+                <div class="space-y-1">
+                    <label class="text-[10px] text-gray-400 font-bold ml-2 uppercase">服务器地址 (Base URL)</label>
+                    <input type="text" id="base-url-input" placeholder="默认 (空)" 
+                        class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 focus:border-sky-400 focus:outline-none text-center bg-white/90 font-mono text-sm" />
+                    <p class="text-[10px] text-gray-400 leading-tight text-center">国内直连请填代理地址<br>(例如: https://.../gemini)</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -362,8 +372,8 @@
             updateStats();
         };
 
-        window.toggleSettings = () => {
-            const el = document.getElementById('advanced-settings');
+        window.toggleSettingsPanel = () => {
+            const el = document.getElementById('settings-panel');
             const arrow = document.getElementById('settings-arrow');
             el.classList.toggle('hidden');
             if (el.classList.contains('hidden')) {
@@ -440,7 +450,15 @@
             const url = inputBaseUrl.value.trim();
             
             if (!key) {
-                alert("请先输入 API Key 才能开始哦！");
+                // Auto-open settings if key is missing
+                const el = document.getElementById('settings-panel');
+                if(el.classList.contains('hidden')) {
+                    window.toggleSettingsPanel();
+                }
+                el.classList.add('shake');
+                setTimeout(() => el.classList.remove('shake'), 500);
+                inputKey.focus();
+                // alert("请先填写 API Key 哦！");
                 return;
             }
             

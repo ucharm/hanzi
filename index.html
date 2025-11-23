@@ -66,6 +66,16 @@
             30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
             40%, 60% { transform: translate3d(4px, 0, 0); }
         }
+
+        /* 简单的柱状图动画 */
+        .bar-grow {
+            animation: growUp 1s ease-out forwards;
+            transform-origin: bottom;
+            transform: scaleY(0);
+        }
+        @keyframes growUp {
+            to { transform: scaleY(1); }
+        }
     </style>
 
     <!-- Import Map for Google GenAI SDK -->
@@ -80,34 +90,60 @@
 <body class="min-h-screen text-slate-800 bg-gradient-to-br from-pink-50 via-white to-sky-50 cursor-custom">
 
     <!-- 1. WELCOME SCREEN -->
-    <div id="screen-welcome" class="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-6">
-        <div class="space-y-2 mb-8">
+    <div id="screen-welcome" class="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-4">
+        <div class="space-y-2 mb-4">
             <div class="text-7xl animate-bounce">🐼</div>
-            <h1 class="text-6xl font-black text-sky-500 tracking-wider drop-shadow-sm">柠小花卷识字</h1>
+            <h1 class="text-5xl font-black text-sky-500 tracking-wider drop-shadow-sm">柠小花卷识字</h1>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="w-full max-w-xs bg-white/70 rounded-3xl p-4 backdrop-blur-sm border border-pink-100 shadow-sm">
+            <div class="flex justify-between items-baseline mb-3">
+                <h3 class="text-gray-500 font-bold text-xs flex items-center gap-1">
+                    <span>📊</span> 学习成长记录
+                </h3>
+                <div class="text-xs text-gray-400">
+                    总识字: <span id="stat-total-count" class="text-2xl font-black text-sky-500 mx-1">0</span> 字
+                </div>
+            </div>
+            <!-- Bar Chart -->
+            <div id="stats-chart" class="flex items-end justify-between h-20 gap-1 pt-2 px-1">
+                <!-- Bars will be injected by JS -->
+                <div class="w-full h-full flex items-center justify-center text-gray-300 text-xs">加载数据...</div>
+            </div>
         </div>
         
-        <!-- Game Mode Buttons (Unified) -->
-        <div class="flex flex-col gap-4 w-full max-w-xs z-10">
+        <!-- Game Controls -->
+        <div class="flex flex-col gap-3 w-full max-w-xs z-10 mt-2">
+            
+            <!-- Question Count Selector -->
+            <div class="bg-white/80 rounded-2xl p-2 flex justify-between items-center w-full shadow-sm">
+                <span class="text-xs font-bold text-gray-400 ml-2 uppercase tracking-wide">本轮题数</span>
+                <div class="flex gap-1 bg-gray-100 rounded-xl p-1">
+                    <button onclick="setQCount(10)" id="btn-count-10" class="flex-1 py-1 px-3 rounded-lg text-sm font-bold transition-all bg-white text-sky-500 shadow-sm">10</button>
+                    <button onclick="setQCount(20)" id="btn-count-20" class="flex-1 py-1 px-3 rounded-lg text-sm font-bold text-gray-400 hover:text-gray-600 transition-all">20</button>
+                    <button onclick="setQCount(30)" id="btn-count-30" class="flex-1 py-1 px-3 rounded-lg text-sm font-bold text-gray-400 hover:text-gray-600 transition-all">30</button>
+                </div>
+            </div>
+
             <!-- Unified Start Button -->
-            <button onclick="startGame()" class="bg-sky-400 hover:bg-sky-500 text-white border-b-4 border-sky-600 font-bold rounded-2xl px-6 py-5 text-2xl active:scale-95 transition-all w-full shadow-lg flex flex-col items-center">
-                <span>🚀 开始挑战</span>
-                <span class="text-sm opacity-80 font-normal mt-1 text-sky-100">看字选音 / 看音选字 (混合)</span>
+            <button onclick="startGame()" class="bg-sky-400 hover:bg-sky-500 text-white border-b-4 border-sky-600 font-bold rounded-2xl px-6 py-4 text-2xl active:scale-95 transition-all w-full shadow-lg flex flex-col items-center group">
+                <span class="group-hover:scale-105 transition-transform">🚀 开始挑战</span>
             </button>
 
             <!-- Mistake Book Button -->
-            <button onclick="openMistakeModal()" class="relative bg-orange-400 hover:bg-orange-500 text-white border-b-4 border-orange-600 font-bold rounded-2xl px-6 py-4 text-xl active:scale-95 transition-all w-full shadow-lg mt-2">
+            <button onclick="openMistakeModal()" class="relative bg-orange-400 hover:bg-orange-500 text-white border-b-4 border-orange-600 font-bold rounded-2xl px-6 py-3 text-lg active:scale-95 transition-all w-full shadow-lg">
                 📖 我的错题本
                 <span id="mistake-badge-main" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white hidden">0</span>
             </button>
-
-            <div class="text-xs text-gray-400 pt-2 flex justify-between items-center px-2">
-                <span>已学会 <span id="mastery-count" class="font-bold text-green-500">0</span> 个汉字</span>
-                <button onclick="clearMastery()" class="text-red-300 underline hover:text-red-400">重置</button>
+            
+            <div class="text-[10px] text-gray-300 w-full text-right pr-2">
+                 <button onclick="clearAllData()" class="hover:text-red-300 transition-colors">🗑️ 重置所有数据</button>
             </div>
         </div>
 
         <!-- Settings Section (Collapsed by default) -->
-        <div class="w-full max-w-xs mt-8">
+        <div class="w-full max-w-xs mt-4">
             <button onclick="toggleSettingsPanel()" class="w-full text-center text-xs text-gray-400 font-bold hover:text-sky-500 transition-colors flex items-center justify-center gap-2 mb-2">
                 <span>⚙️ 设置 (API Key & 服务器)</span>
                 <span id="settings-arrow">▼</span>
@@ -144,7 +180,7 @@
     <div id="screen-loading" class="hidden min-h-screen flex flex-col items-center justify-center text-center p-8">
         <div class="w-20 h-20 border-8 border-sky-200 border-t-sky-500 rounded-full animate-spin mb-8"></div>
         <h2 class="text-3xl font-bold text-sky-600 mb-2">正在出题中...</h2>
-        <p class="text-gray-400">AI 老师正在准备试卷...</p>
+        <p class="text-gray-400">AI 老师正在准备 <span id="loading-count">10</span> 道题目...</p>
         <p id="retry-message" class="text-orange-400 text-sm mt-4 hidden font-bold animate-pulse">网络有点卡，正在尝试切换线路...</p>
     </div>
 
@@ -268,39 +304,169 @@
 
         // --- STATE ---
         let appState = {
-            items: [], // Each item now has a 'mode' property: 'HANZI_TO_PINYIN' or 'PINYIN_TO_HANZI'
+            items: [], 
             currentIndex: 0,
             score: 0,
+            targetCount: 10, // Default 10 questions
             apiKey: localStorage.getItem('GEMINI_API_KEY') || '',
             baseUrl: localStorage.getItem('GEMINI_BASE_URL') || '',
             modelName: localStorage.getItem('GEMINI_MODEL_NAME') || ''
         };
 
         // --- STORAGE KEYS ---
-        const MASTERY_KEY = 'HANZI_MASTERY_LIST';
+        const MASTERY_KEY = 'HANZI_MASTERY_LIST'; // Used for prompt exclusion (Last 100)
         const MISTAKE_KEY = 'HANZI_MISTAKES_LIST';
+        const TOTAL_MASTERY_KEY = 'HANZI_TOTAL_MASTERY_SET'; // Full unique set of mastered chars
+        const DAILY_STATS_KEY = 'HANZI_DAILY_STATS_LOG'; // Date -> Count map
         const MAX_MASTERY_SIZE = 100;
 
-        // --- MASTERY LOGIC ---
-        function getMasteredChars() {
+        // --- HELPER: Dates ---
+        function getTodayStr() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // --- MASTERY & STATS LOGIC ---
+        function getRecentMastery() {
             try { return JSON.parse(localStorage.getItem(MASTERY_KEY) || '[]'); } catch (e) { return []; }
         }
 
-        function saveMastery(char) {
-            let list = getMasteredChars();
-            list = list.filter(c => c !== char);
-            list.push(char);
-            if (list.length > MAX_MASTERY_SIZE) list = list.slice(list.length - MAX_MASTERY_SIZE);
-            localStorage.setItem(MASTERY_KEY, JSON.stringify(list));
-            updateStats();
+        function getTotalMasterySet() {
+            try { return new Set(JSON.parse(localStorage.getItem(TOTAL_MASTERY_KEY) || '[]')); } catch (e) { return new Set(); }
         }
 
-        window.clearMastery = () => {
-            if(confirm('确定要清空所有已学会的汉字记录吗？')) {
+        function getDailyStats() {
+            try { return JSON.parse(localStorage.getItem(DAILY_STATS_KEY) || '{}'); } catch (e) { return {}; }
+        }
+
+        function saveMasteryAndStats(char) {
+            // 1. Update Total Mastery (Unique Count) & Daily Log
+            const totalSet = getTotalMasterySet();
+            const dailyStats = getDailyStats();
+            const today = getTodayStr();
+
+            if (!totalSet.has(char)) {
+                // New word learned!
+                totalSet.add(char);
+                localStorage.setItem(TOTAL_MASTERY_KEY, JSON.stringify([...totalSet]));
+
+                // Update daily count
+                dailyStats[today] = (dailyStats[today] || 0) + 1;
+                localStorage.setItem(DAILY_STATS_KEY, JSON.stringify(dailyStats));
+            }
+
+            // 2. Update Recent Mastery (for Prompt Exclusion - LRU style)
+            let recentList = getRecentMastery();
+            recentList = recentList.filter(c => c !== char);
+            recentList.push(char);
+            if (recentList.length > MAX_MASTERY_SIZE) recentList = recentList.slice(recentList.length - MAX_MASTERY_SIZE);
+            localStorage.setItem(MASTERY_KEY, JSON.stringify(recentList));
+
+            updateStatsUI();
+        }
+
+        window.clearAllData = () => {
+            if(confirm('警告：确定要重置所有识字记录、错题本和统计数据吗？')) {
                 localStorage.removeItem(MASTERY_KEY);
-                updateStats();
+                localStorage.removeItem(MISTAKE_KEY);
+                localStorage.removeItem(TOTAL_MASTERY_KEY);
+                localStorage.removeItem(DAILY_STATS_KEY);
+                alert("数据已重置");
+                updateStatsUI();
+                openMistakeModal(); // Force refresh of mistake UI state if open, or just ensure UI sync
+                closeMistakeModal();
             }
         }
+
+        // --- UI: STATS CHART ---
+        function updateStatsUI() {
+            // Update Mistake Badge
+            const mistakeList = getMistakes();
+            const elBadge = document.getElementById('mistake-badge-main');
+            if (elBadge) {
+                if (mistakeList.length > 0) {
+                    elBadge.innerText = mistakeList.length;
+                    elBadge.classList.remove('hidden');
+                } else {
+                    elBadge.classList.add('hidden');
+                }
+            }
+
+            // Update Total Count
+            const totalSet = getTotalMasterySet();
+            const elTotal = document.getElementById('stat-total-count');
+            if(elTotal) elTotal.innerText = totalSet.size;
+
+            // Render Chart
+            renderChart();
+        }
+
+        function renderChart() {
+            const chartContainer = document.getElementById('stats-chart');
+            if(!chartContainer) return;
+            chartContainer.innerHTML = '';
+
+            const dailyStats = getDailyStats();
+            const days = 7;
+            const dataPoints = [];
+            let maxVal = 0;
+
+            // Generate last 7 days data
+            for (let i = days - 1; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${day}`;
+                const displayDate = `${month}/${day}`;
+                
+                const count = dailyStats[dateStr] || 0;
+                if(count > maxVal) maxVal = count;
+                dataPoints.push({ date: displayDate, count: count, fullDate: dateStr });
+            }
+
+            if (maxVal === 0) maxVal = 5; // Min scale
+
+            // Create Bars
+            dataPoints.forEach((pt, idx) => {
+                const heightPercent = Math.max(15, (pt.count / maxVal) * 100); // Min height for visibility
+                const isToday = pt.fullDate === getTodayStr();
+                
+                const col = document.createElement('div');
+                col.className = "flex flex-col items-center justify-end w-1/7 h-full group relative";
+                
+                // Tooltip
+                col.innerHTML = `
+                    <div class="absolute -top-8 bg-slate-700 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                        ${pt.count} 字
+                    </div>
+                    <div class="w-3 md:w-4 rounded-t-md ${isToday ? 'bg-sky-400' : 'bg-pink-200'} bar-grow relative" style="height: ${heightPercent}%; animation-delay: ${idx * 0.1}s">
+                         ${pt.count > 0 ? `<div class="absolute -top-4 w-full text-center text-[9px] text-gray-400 font-bold">${pt.count}</div>` : ''}
+                    </div>
+                    <div class="text-[9px] text-gray-400 mt-1 scale-90">${pt.date}</div>
+                `;
+                chartContainer.appendChild(col);
+            });
+        }
+
+        // --- QUESTION COUNT SELECTOR ---
+        window.setQCount = (n) => {
+            appState.targetCount = n;
+            // Update UI
+            [10, 20, 30].forEach(val => {
+                const btn = document.getElementById(`btn-count-${val}`);
+                if (val === n) {
+                    btn.className = "flex-1 py-1 px-3 rounded-lg text-sm font-bold transition-all bg-white text-sky-500 shadow-sm";
+                } else {
+                    btn.className = "flex-1 py-1 px-3 rounded-lg text-sm font-bold text-gray-400 hover:text-gray-600 transition-all";
+                }
+            });
+            playSound('click');
+        };
 
         // --- MISTAKE BANK LOGIC ---
         function getMistakes() {
@@ -321,7 +487,7 @@
                 };
                 list.push(cleanItem);
                 localStorage.setItem(MISTAKE_KEY, JSON.stringify(list));
-                updateStats();
+                updateStatsUI();
             }
         }
 
@@ -331,29 +497,10 @@
             list = list.filter(i => i.character !== char);
             if (list.length !== initialLength) {
                 localStorage.setItem(MISTAKE_KEY, JSON.stringify(list));
-                updateStats();
+                updateStatsUI();
                 return true; // Indicates it was removed
             }
             return false;
-        }
-
-        function updateStats() {
-            // Update Mastery Count
-            const masterList = getMasteredChars();
-            const elMastery = document.getElementById('mastery-count');
-            if(elMastery) elMastery.innerText = masterList.length;
-
-            // Update Mistake Badge
-            const mistakeList = getMistakes();
-            const elBadge = document.getElementById('mistake-badge-main');
-            if (elBadge) {
-                if (mistakeList.length > 0) {
-                    elBadge.innerText = mistakeList.length;
-                    elBadge.classList.remove('hidden');
-                } else {
-                    elBadge.classList.add('hidden');
-                }
-            }
         }
 
         // --- DOM ELEMENTS ---
@@ -375,7 +522,11 @@
         if (appState.apiKey) inputKey.value = appState.apiKey;
         if (appState.baseUrl) inputBaseUrl.value = appState.baseUrl;
         if (appState.modelName) inputModelName.value = appState.modelName;
-        updateStats();
+        
+        // Initial Stats Render
+        updateStatsUI();
+        // Initial Count UI
+        window.setQCount(10); 
 
         // --- NAVIGATION ---
         function showScreen(name) {
@@ -391,7 +542,7 @@
         window.goHome = () => {
             playSound('click');
             showScreen('welcome');
-            updateStats();
+            updateStatsUI(); // Refresh stats when returning home
         };
 
         window.toggleSettingsPanel = () => {
@@ -453,8 +604,10 @@
             // Setup Review Mode
             // Shuffle mistakes
             let items = [...list].sort(() => Math.random() - 0.5);
-            // Limit to 10 for a session
-            if (items.length > 10) items = items.slice(0, 10);
+            // Limit to targetCount if needed, but for mistakes usually we review all or batch
+            // Let's limit to the selected targetCount for consistency, or 10 if too many
+            const limit = appState.targetCount || 10;
+            if (items.length > limit) items = items.slice(0, limit);
             
             // Assign random mode to each review item
             items.forEach(item => {
@@ -464,7 +617,7 @@
             appState.items = items;
             appState.currentIndex = 0;
             appState.score = 0;
-            appState.isReview = true; // Flag to know if we are in review
+            appState.isReview = true; 
             
             renderQuestion();
             showScreen('quiz');
@@ -500,10 +653,11 @@
             localStorage.setItem('GEMINI_MODEL_NAME', model);
 
             showScreen('loading');
+            document.getElementById('loading-count').innerText = appState.targetCount;
 
             try {
-                const mastered = getMasteredChars();
-                const data = await fetchQuizData(appState.apiKey, appState.baseUrl, appState.modelName, mastered);
+                const mastered = getRecentMastery(); // Only send recent 100 to API
+                const data = await fetchQuizData(appState.apiKey, appState.baseUrl, appState.modelName, mastered, appState.targetCount);
                 
                 // Randomly assign mode to each item
                 data.items.forEach(item => {
@@ -542,10 +696,10 @@
         };
 
         // --- GEMINI SERVICE ---
-        async function fetchQuizData(apiKey, baseUrl, modelName, excludedChars) {
+        async function fetchQuizData(apiKey, baseUrl, modelName, excludedChars, qCount = 10) {
             const excludedStr = excludedChars.slice(-50).join(', ');
             const promptText = `
-            Create 10 quiz items for Chinese primary school students (Grades 1-2).
+            Create ${qCount} quiz items for Chinese primary school students (Grades 1-2).
             **IMPORTANT**: Exclude these chars: [${excludedStr}]. Choose different simple ones.
             Format: JSON.
             Structure:
@@ -703,7 +857,7 @@
             if (isCorrect) {
                 appState.score++;
                 playSound('correct');
-                saveMastery(item.character);
+                saveMasteryAndStats(item.character);
                 // Important: Remove from mistakes if correct!
                 removedFromMistakes = removeFromMistakes(item.character);
             } else {

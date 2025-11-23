@@ -1,7 +1,7 @@
 {
   "name": "萌萌识字",
   "short_name": "萌萌识字",
-  "start_url": ".",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fff1f2",
   "theme_color": "#fff1f2",

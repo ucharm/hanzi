@@ -1,61 +1,480 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#fff1f2" />
-    <meta name="description" content="萌萌识字 - 儿童趣味汉字测试" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="萌萌识字" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#fff1f2">
+    <meta name="description" content="萌萌识字 - 儿童趣味汉字测试">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="萌萌识字">
+    <title>萌萌识字 - 趣味闯关</title>
     
-    <title>萌萌识字 - 儿童趣味汉字测试</title>
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
-    
-    <!-- App Icon (using SVG data URI for simplicity) -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>" />
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>" />
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
 
+    <!-- Tailwind CSS (Direct CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
-      
-      body {
-        font-family: 'ZCOOL KuaiLe', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #fff1f2; /* rose-50 */
-        /* Prevent pull-to-refresh on mobile to feel more like an app */
-        overscroll-behavior-y: none;
-      }
-      
-      /* Custom scrollbar for cute aesthetics */
-      ::-webkit-scrollbar {
-        width: 10px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #ffe4e6; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #fda4af; 
-        border-radius: 5px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #fb7185; 
-      }
+        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+        
+        body {
+            font-family: 'ZCOOL KuaiLe', sans-serif;
+            background-color: #fff1f2;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0"
-  }
-}
-</script>
+
+    <!-- Import Map for Google GenAI SDK -->
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.run/@google/genai"
+      }
+    }
+    </script>
 </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<body class="min-h-screen text-slate-800 bg-gradient-to-br from-pink-50 via-white to-sky-50">
+
+    <!-- 1. WELCOME SCREEN -->
+    <div id="screen-welcome" class="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-8">
+        <div class="text-7xl animate-bounce">🐼</div>
+        <h1 class="text-6xl font-black text-sky-500 tracking-wider drop-shadow-sm">萌萌识字</h1>
+        <p class="text-xl text-gray-500">和 AI 老师一起挑战汉字！</p>
+        
+        <!-- API Key Input -->
+        <div class="w-full max-w-xs space-y-2">
+            <input type="password" id="api-key-input" placeholder="粘贴你的 API Key" 
+                class="w-full px-4 py-3 rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none text-center bg-white/80" />
+            <p class="text-xs text-gray-400">Key 仅保存在你的浏览器中，不会上传</p>
+        </div>
+
+        <div class="flex flex-col gap-4 w-full max-w-xs pt-4">
+            <button onclick="startGame('HANZI_TO_PINYIN')" class="bg-sky-400 hover:bg-sky-500 text-white border-b-4 border-sky-600 font-bold rounded-2xl px-6 py-4 text-xl active:scale-95 transition-all w-full shadow-lg">
+                看字选音 <span class="text-sm opacity-80 ml-2">(汉 ➔ pin)</span>
+            </button>
+            <button onclick="startGame('PINYIN_TO_HANZI')" class="bg-purple-400 hover:bg-purple-500 text-white border-b-4 border-purple-600 font-bold rounded-2xl px-6 py-4 text-xl active:scale-95 transition-all w-full shadow-lg">
+                看音选字 <span class="text-sm opacity-80 ml-2">(pin ➔ 汉)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. LOADING SCREEN -->
+    <div id="screen-loading" class="hidden min-h-screen flex flex-col items-center justify-center text-center p-8">
+        <div class="w-20 h-20 border-8 border-sky-200 border-t-sky-500 rounded-full animate-spin mb-8"></div>
+        <h2 class="text-3xl font-bold text-sky-600 mb-2">正在出题中...</h2>
+        <p class="text-gray-400">AI 老师正在思考有趣的题目 (约需5-10秒)</p>
+    </div>
+
+    <!-- 3. QUIZ SCREEN -->
+    <div id="screen-quiz" class="hidden min-h-screen flex flex-col items-center p-4 md:p-8 max-w-2xl mx-auto w-full">
+        <!-- Header -->
+        <div class="w-full flex justify-between items-center mb-6">
+            <button onclick="goHome()" class="bg-white hover:bg-gray-50 text-gray-600 border border-gray-200 font-bold rounded-xl px-4 py-2 text-sm shadow-sm">
+                🏠 退出
+            </button>
+            <div class="flex flex-col items-end">
+                 <div class="text-xs text-gray-400 font-bold uppercase tracking-widest">进度</div>
+                 <div class="text-2xl font-black text-sky-500"><span id="current-q-num">1</span> / <span id="total-q-num">10</span></div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full h-4 bg-gray-200 rounded-full mb-8 overflow-hidden">
+            <div id="progress-bar" class="h-full bg-sky-400 transition-all duration-500 ease-out rounded-full" style="width: 10%"></div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="bg-white rounded-3xl p-10 w-full shadow-xl border-4 border-amber-200 flex flex-col items-center justify-center mb-8 relative overflow-hidden card-shadow">
+            <div class="absolute -top-10 -left-10 w-24 h-24 bg-yellow-100 rounded-full opacity-50"></div>
+            <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-pink-100 rounded-full opacity-50"></div>
+            
+            <h2 id="question-instruction" class="text-gray-400 text-lg font-bold mb-2 z-10">题目</h2>
+            <div id="question-text" class="font-black z-10 text-slate-700 text-8xl transition-all">
+                ?
+            </div>
+        </div>
+
+        <!-- Options -->
+        <div id="options-grid" class="grid grid-cols-2 gap-4 w-full">
+            <!-- Buttons injected by JS -->
+        </div>
+    </div>
+
+    <!-- 4. FEEDBACK MODAL -->
+    <div id="modal-feedback" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl bounce-in border-4 border-white ring-4 ring-yellow-200 relative">
+            
+            <!-- Icon -->
+            <div class="flex justify-center -mt-16 mb-4">
+                <div id="feedback-icon-bg" class="rounded-full p-4 border-4 border-white shadow-lg bg-gray-200">
+                    <span id="feedback-icon" class="text-4xl">🤔</span>
+                </div>
+            </div>
+
+            <div class="text-center mb-6">
+                <h2 id="feedback-title" class="text-3xl font-bold mb-2">...</h2>
+                <div class="flex items-center justify-center gap-4 text-slate-700 bg-slate-50 rounded-xl p-4 mx-auto w-fit border border-slate-100">
+                    <span id="fb-char" class="text-5xl font-black"></span>
+                    <span id="fb-pinyin" class="text-3xl font-medium text-slate-500"></span>
+                </div>
+            </div>
+
+            <div class="space-y-3 mb-8">
+                <h3 class="text-gray-400 font-bold text-xs uppercase tracking-wider text-center">词语学习</h3>
+                <div id="examples-list" class="space-y-2">
+                    <!-- Examples injected by JS -->
+                </div>
+            </div>
+
+            <button onclick="nextQuestion()" class="bg-sky-400 hover:bg-sky-500 text-white border-b-4 border-sky-600 font-bold rounded-2xl px-6 py-3 text-xl w-full active:scale-95 transition-all">
+                继续下一题 ➔
+            </button>
+        </div>
+    </div>
+
+    <!-- 5. FINISHED SCREEN -->
+    <div id="screen-finished" class="hidden flex flex-col items-center justify-center min-h-screen p-8 text-center space-y-8 bg-white/50">
+        <div id="final-emoji" class="text-8xl animate-bounce">🏆</div>
+        <div>
+            <h2 id="final-title" class="text-4xl font-black mb-2 text-slate-800">完成啦!</h2>
+            <p class="text-gray-500 text-xl">一共 <span id="final-total">10</span> 题，答对 <span id="final-score">0</span> 题</p>
+        </div>
+
+        <div class="text-7xl font-black text-slate-800 drop-shadow-md">
+            <span id="final-points">0</span><span class="text-3xl text-gray-400 ml-2">分</span>
+        </div>
+
+        <div class="flex gap-4 w-full max-w-xs pt-4">
+            <button onclick="goHome()" class="flex-1 bg-white hover:bg-gray-50 text-gray-700 border-b-4 border-gray-200 font-bold rounded-2xl px-4 py-3 active:scale-95">
+                返回首页
+            </button>
+            <button onclick="replayGame()" class="flex-1 bg-green-400 hover:bg-green-500 text-white border-b-4 border-green-600 font-bold rounded-2xl px-4 py-3 active:scale-95">
+                再玩一次
+            </button>
+        </div>
+    </div>
+
+    <!-- LOGIC SCRIPT -->
+    <script type="module">
+        import { GoogleGenAI } from "@google/genai";
+
+        // --- STATE ---
+        let appState = {
+            mode: 'HANZI_TO_PINYIN', // or 'PINYIN_TO_HANZI'
+            items: [],
+            currentIndex: 0,
+            score: 0,
+            apiKey: localStorage.getItem('GEMINI_API_KEY') || ''
+        };
+
+        // --- DOM ELEMENTS ---
+        const screens = {
+            welcome: document.getElementById('screen-welcome'),
+            loading: document.getElementById('screen-loading'),
+            quiz: document.getElementById('screen-quiz'),
+            finished: document.getElementById('screen-finished')
+        };
+        const modals = {
+            feedback: document.getElementById('modal-feedback')
+        };
+        const inputKey = document.getElementById('api-key-input');
+
+        // Initialize Input
+        if (appState.apiKey) inputKey.value = appState.apiKey;
+
+        // --- NAVIGATION ---
+        function showScreen(name) {
+            Object.values(screens).forEach(el => el.classList.add('hidden'));
+            if(screens[name]) screens[name].classList.remove('hidden');
+        }
+
+        window.goHome = () => {
+            playSound('click');
+            showScreen('welcome');
+        };
+
+        // --- GAME START LOGIC ---
+        window.startGame = async (mode) => {
+            initAudio(); // Unlock audio context
+            playSound('start');
+
+            // Save API Key
+            const key = inputKey.value.trim();
+            if (!key) {
+                alert("请先输入 API Key 才能开始哦！");
+                return;
+            }
+            appState.apiKey = key;
+            localStorage.setItem('GEMINI_API_KEY', key);
+
+            appState.mode = mode;
+            showScreen('loading');
+
+            try {
+                // Fetch Data
+                const data = await fetchQuizData(appState.apiKey);
+                appState.items = data.items;
+                appState.currentIndex = 0;
+                appState.score = 0;
+                
+                renderQuestion();
+                showScreen('quiz');
+            } catch (e) {
+                console.error(e);
+                alert("出题失败了：" + e.message + "\n请检查 API Key 是否正确或网络是否通畅。");
+                showScreen('welcome');
+            }
+        };
+
+        window.replayGame = () => {
+            window.startGame(appState.mode);
+        };
+
+        // --- GEMINI SERVICE ---
+        async function fetchQuizData(apiKey) {
+            const ai = new GoogleGenAI({ apiKey });
+            
+            const prompt = `
+            Create 10 quiz items for Chinese primary school students (Grades 1-2).
+            Format: JSON.
+            Structure:
+            {
+              "items": [
+                {
+                  "character": "汉字",
+                  "pinyin": "correct pinyin",
+                  "wrongPinyins": ["wrong1", "wrong2", "wrong3"],
+                  "wrongChars": ["错1", "错2", "错3"],
+                  "examples": [
+                    {"word": "词语1", "pinyin": "pinyin1"},
+                    {"word": "词语2", "pinyin": "pinyin2"},
+                    {"word": "词语3", "pinyin": "pinyin3"}
+                  ]
+                }
+              ]
+            }
+            Make sure characters are common simple ones.
+            `;
+
+            const response = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: prompt,
+                config: {
+                    responseMimeType: "application/json"
+                }
+            });
+
+            return JSON.parse(response.text);
+        }
+
+        // --- RENDER GAME ---
+        function renderQuestion() {
+            const item = appState.items[appState.currentIndex];
+            const isHanzi = appState.mode === 'HANZI_TO_PINYIN';
+
+            // Update Header
+            document.getElementById('current-q-num').innerText = appState.currentIndex + 1;
+            document.getElementById('total-q-num').innerText = appState.items.length;
+            document.getElementById('progress-bar').style.width = `${((appState.currentIndex) / appState.items.length) * 100}%`;
+
+            // Update Card
+            document.getElementById('question-instruction').innerText = isHanzi ? "请选择正确的拼音" : "请选择对应的汉字";
+            const qText = document.getElementById('question-text');
+            qText.innerText = isHanzi ? item.character : item.pinyin;
+            qText.className = isHanzi ? "font-black z-10 text-slate-700 text-8xl transition-all" : "font-black z-10 text-slate-700 text-6xl transition-all";
+
+            // Options
+            const correct = isHanzi ? item.pinyin : item.character;
+            const wrongs = isHanzi ? item.wrongPinyins : item.wrongChars;
+            const options = [...wrongs, correct].sort(() => Math.random() - 0.5);
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = ''; // Clear
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white hover:bg-sky-50 hover:text-sky-600 hover:border-sky-300 text-slate-600 border-2 border-slate-200 font-bold rounded-2xl h-20 text-2xl shadow-sm active:scale-95 transition-all";
+                btn.innerText = opt;
+                btn.onclick = () => handleAnswer(opt, correct);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, correct) {
+            const isCorrect = selected === correct;
+            if (isCorrect) {
+                appState.score++;
+                playSound('correct');
+            } else {
+                playSound('wrong');
+            }
+
+            showFeedback(isCorrect);
+        }
+
+        function showFeedback(isCorrect) {
+            const item = appState.items[appState.currentIndex];
+            
+            // UI Updates
+            const title = document.getElementById('feedback-title');
+            const iconBg = document.getElementById('feedback-icon-bg');
+            const icon = document.getElementById('feedback-icon');
+
+            if (isCorrect) {
+                title.innerText = "答对啦！";
+                title.className = "text-3xl font-bold mb-2 text-green-500";
+                iconBg.className = "rounded-full p-4 border-4 border-white shadow-lg bg-green-400";
+                icon.innerText = "🌟";
+            } else {
+                title.innerText = "再接再厉！";
+                title.className = "text-3xl font-bold mb-2 text-rose-500";
+                iconBg.className = "rounded-full p-4 border-4 border-white shadow-lg bg-rose-400";
+                icon.innerText = "🤔";
+            }
+
+            document.getElementById('fb-char').innerText = item.character;
+            document.getElementById('fb-pinyin').innerText = item.pinyin;
+
+            const list = document.getElementById('examples-list');
+            list.innerHTML = '';
+            item.examples.forEach(ex => {
+                const row = document.createElement('div');
+                row.className = "flex justify-between items-center bg-amber-50 p-3 rounded-xl border border-amber-100";
+                row.innerHTML = `<span class="text-lg font-bold text-amber-800">${ex.word}</span><span class="text-md text-amber-600 font-mono">${ex.pinyin}</span>`;
+                list.appendChild(row);
+            });
+
+            modals.feedback.classList.remove('hidden');
+        }
+
+        window.nextQuestion = () => {
+            modals.feedback.classList.add('hidden');
+            playSound('click');
+            
+            if (appState.currentIndex < appState.items.length - 1) {
+                appState.currentIndex++;
+                renderQuestion();
+            } else {
+                finishGame();
+            }
+        };
+
+        function finishGame() {
+            setTimeout(() => playSound('victory'), 300);
+            showScreen('finished');
+            
+            document.getElementById('final-total').innerText = appState.items.length;
+            document.getElementById('final-score').innerText = appState.score;
+            document.getElementById('final-points').innerText = appState.score * 10;
+
+            const percent = (appState.score / appState.items.length) * 100;
+            let emoji = '😐'; 
+            let title = '完成!';
+            
+            if(percent === 100) { emoji='🏆'; title='太棒了! 满分!'; }
+            else if(percent >= 80) { emoji='🎉'; title='非常优秀!'; }
+            else if(percent >= 60) { emoji='👍'; title='继续加油!'; }
+
+            document.getElementById('final-emoji').innerText = emoji;
+            document.getElementById('final-title').innerText = title;
+        }
+
+        // --- AUDIO SERVICE (Vanilla JS Version) ---
+        let audioCtx = null;
+
+        window.initAudio = () => {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        };
+
+        window.playSound = (type) => {
+            if (!audioCtx) window.initAudio();
+            if (!audioCtx) return;
+            const t = audioCtx.currentTime;
+            
+            if (type === 'click') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, t);
+                osc.frequency.exponentialRampToValueAtTime(1000, t + 0.08);
+                gain.gain.setValueAtTime(0.05, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t);
+                osc.stop(t + 0.08);
+            } else if (type === 'correct') {
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    const filter = audioCtx.createBiquadFilter();
+                    osc.type = 'triangle';
+                    filter.type = "lowpass"; filter.frequency.value = 2000;
+                    osc.frequency.setValueAtTime(f, t);
+                    const st = t + i * 0.08;
+                    gain.gain.setValueAtTime(0, st);
+                    gain.gain.linearRampToValueAtTime(0.05, st + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, st + 0.4);
+                    osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(st); osc.stop(st + 0.5);
+                });
+            } else if (type === 'wrong') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, t);
+                osc.frequency.linearRampToValueAtTime(100, t + 0.3);
+                gain.gain.setValueAtTime(0.05, t);
+                gain.gain.linearRampToValueAtTime(0, t + 0.3);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(t); osc.stop(t + 0.3);
+            } else if (type === 'victory') {
+                [523, 659, 783, 1046, 1318, 1567].forEach((f, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'square';
+                    const st = t + i * 0.08;
+                    osc.frequency.setValueAtTime(f, st);
+                    gain.gain.setValueAtTime(0, st);
+                    gain.gain.linearRampToValueAtTime(0.04, st + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, st + 0.3);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(st); osc.stop(st + 0.4);
+                });
+            } else if (type === 'start') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.frequency.setValueAtTime(200, t);
+                osc.frequency.exponentialRampToValueAtTime(800, t + 0.3);
+                gain.gain.setValueAtTime(0, t);
+                gain.gain.linearRampToValueAtTime(0.08, t + 0.1);
+                gain.gain.linearRampToValueAtTime(0, t + 0.3);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(t); osc.stop(t + 0.3);
+            }
+        };
+    </script>
+</body>
 </html>

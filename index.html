@@ -20,16 +20,15 @@
         @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
         
         /* 
-           1. 自定义超大鼠标样式 
-           使用 SVG Data URI 绘制一个深色描边的手指
+           1. 自定义超大鼠标样式 (80px 纯黑)
         */
         .cursor-custom {
-            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 320 512" style="fill:%23334155; stroke:white; stroke-width:15px;"><path d="M0 268.7V128c0-17.7 14.3-32 32-32s32 14.3 32 32v122.7l9.4-4.7c17.7-8.8 39.1-1.7 48 16s1.7 39.1-16 48l-37.4 18.7c-9.6 4.8-15.4 14.7-15.4 25.4s5.8 20.6 15.4 25.4l154.6 77.3c17.7 8.8 24.8 30.2 16 48s-30.2 24.8-48 16L32 413.3C13.3 404 1.3 385.1 1.3 364.3L0 268.7zM160 32c0-17.7 14.3-32 32-32s32 14.3 32 32v176c0 17.7-14.3 32-32 32s-32-14.3-32-32V32zm96 32c0-17.7 14.3-32 32-32s32 14.3 32 32v128c0 17.7-14.3 32-32 32s-32-14.3-32-32V64z"/></svg>') 10 0, auto;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 320 512" style="fill:%23000000; stroke:white; stroke-width:15px;"><path d="M0 268.7V128c0-17.7 14.3-32 32-32s32 14.3 32 32v122.7l9.4-4.7c17.7-8.8 39.1-1.7 48 16s1.7 39.1-16 48l-37.4 18.7c-9.6 4.8-15.4 14.7-15.4 25.4s5.8 20.6 15.4 25.4l154.6 77.3c17.7 8.8 24.8 30.2 16 48s-30.2 24.8-48 16L32 413.3C13.3 404 1.3 385.1 1.3 364.3L0 268.7zM160 32c0-17.7 14.3-32 32-32s32 14.3 32 32v176c0 17.7-14.3 32-32 32s-32-14.3-32-32V32zm96 32c0-17.7 14.3-32 32-32s32 14.3 32 32v128c0 17.7-14.3 32-32 32s-32-14.3-32-32V64z"/></svg>') 15 0, auto;
         }
 
-        /* 按钮悬停时也保持大手手样式，而不是变回默认小手 */
+        /* 按钮悬停时也保持大手手样式 */
         .cursor-pointer-custom, button, input, a {
-            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 320 512" style="fill:%230284c7; stroke:white; stroke-width:15px;"><path d="M0 268.7V128c0-17.7 14.3-32 32-32s32 14.3 32 32v122.7l9.4-4.7c17.7-8.8 39.1-1.7 48 16s1.7 39.1-16 48l-37.4 18.7c-9.6 4.8-15.4 14.7-15.4 25.4s5.8 20.6 15.4 25.4l154.6 77.3c17.7 8.8 24.8 30.2 16 48s-30.2 24.8-48 16L32 413.3C13.3 404 1.3 385.1 1.3 364.3L0 268.7zM160 32c0-17.7 14.3-32 32-32s32 14.3 32 32v176c0 17.7-14.3 32-32 32s-32-14.3-32-32V32zm96 32c0-17.7 14.3-32 32-32s32 14.3 32 32v128c0 17.7-14.3 32-32 32s-32-14.3-32-32V64z"/></svg>') 10 0, pointer !important;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 320 512" style="fill:%23000000; stroke:white; stroke-width:15px;"><path d="M0 268.7V128c0-17.7 14.3-32 32-32s32 14.3 32 32v122.7l9.4-4.7c17.7-8.8 39.1-1.7 48 16s1.7 39.1-16 48l-37.4 18.7c-9.6 4.8-15.4 14.7-15.4 25.4s5.8 20.6 15.4 25.4l154.6 77.3c17.7 8.8 24.8 30.2 16 48s-30.2 24.8-48 16L32 413.3C13.3 404 1.3 385.1 1.3 364.3L0 268.7zM160 32c0-17.7 14.3-32 32-32s32 14.3 32 32v176c0 17.7-14.3 32-32 32s-32-14.3-32-32V32zm96 32c0-17.7 14.3-32 32-32s32 14.3 32 32v128c0 17.7-14.3 32-32 32s-32-14.3-32-32V64z"/></svg>') 15 0, pointer !important;
         }
         
         body {
@@ -93,12 +92,20 @@
         </div>
 
         <div class="flex flex-col gap-4 w-full max-w-xs pt-2">
+            <!-- Game Mode Buttons -->
             <button onclick="startGame('HANZI_TO_PINYIN')" class="bg-sky-400 hover:bg-sky-500 text-white border-b-4 border-sky-600 font-bold rounded-2xl px-6 py-4 text-xl active:scale-95 transition-all w-full shadow-lg">
                 看字选音 <span class="text-sm opacity-80 ml-2">(汉 ➔ pin)</span>
             </button>
             <button onclick="startGame('PINYIN_TO_HANZI')" class="bg-purple-400 hover:bg-purple-500 text-white border-b-4 border-purple-600 font-bold rounded-2xl px-6 py-4 text-xl active:scale-95 transition-all w-full shadow-lg">
                 看音选字 <span class="text-sm opacity-80 ml-2">(pin ➔ 汉)</span>
             </button>
+
+            <!-- Mistake Book Button -->
+            <button onclick="openMistakeModal()" class="relative bg-orange-400 hover:bg-orange-500 text-white border-b-4 border-orange-600 font-bold rounded-2xl px-6 py-4 text-xl active:scale-95 transition-all w-full shadow-lg mt-2">
+                📖 我的错题本
+                <span id="mistake-badge-main" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center border-2 border-white hidden">0</span>
+            </button>
+
             <div class="text-xs text-gray-400 pt-2">
                 已学会 <span id="mastery-count" class="font-bold text-green-500">0</span> 个汉字 (智能过滤)
             </div>
@@ -112,7 +119,7 @@
     <div id="screen-loading" class="hidden min-h-screen flex flex-col items-center justify-center text-center p-8">
         <div class="w-20 h-20 border-8 border-sky-200 border-t-sky-500 rounded-full animate-spin mb-8"></div>
         <h2 class="text-3xl font-bold text-sky-600 mb-2">正在出题中...</h2>
-        <p class="text-gray-400">AI 老师正在筛选你不认识的字...</p>
+        <p class="text-gray-400">AI 老师正在准备试卷...</p>
     </div>
 
     <!-- 3. QUIZ SCREEN -->
@@ -182,7 +189,32 @@
         </div>
     </div>
 
-    <!-- 5. FINISHED SCREEN -->
+    <!-- 5. MISTAKE BOOK MODAL -->
+    <div id="modal-mistakes" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl w-full max-w-md h-[80vh] flex flex-col p-6 shadow-2xl border-4 border-orange-200 relative">
+            
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-black text-orange-500">📖 我的错题本</h2>
+                <button onclick="closeMistakeModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">✕</button>
+            </div>
+
+            <div id="mistake-empty-state" class="hidden flex-1 flex flex-col items-center justify-center text-center text-gray-400">
+                <span class="text-6xl mb-4">🌟</span>
+                <p>太棒了！<br>暂时没有错题哦！</p>
+            </div>
+
+            <!-- List -->
+            <div id="mistake-list" class="flex-1 overflow-y-auto space-y-2 pr-2 mb-4">
+                <!-- Items injected here -->
+            </div>
+
+            <button id="btn-review-mistakes" onclick="startReviewGame()" class="bg-orange-400 hover:bg-orange-500 text-white border-b-4 border-orange-600 font-bold rounded-2xl px-6 py-3 text-lg w-full active:scale-95 transition-all hidden">
+                ✍️ 开始复习这些字
+            </button>
+        </div>
+    </div>
+
+    <!-- 6. FINISHED SCREEN -->
     <div id="screen-finished" class="hidden flex flex-col items-center justify-center min-h-screen p-8 text-center space-y-8 bg-white/50">
         <div id="final-emoji" class="text-8xl animate-bounce">🏆</div>
         <div>
@@ -210,7 +242,7 @@
 
         // --- STATE ---
         let appState = {
-            mode: 'HANZI_TO_PINYIN', // or 'PINYIN_TO_HANZI'
+            mode: 'HANZI_TO_PINYIN', // or 'PINYIN_TO_HANZI' or 'REVIEW'
             items: [],
             currentIndex: 0,
             score: 0,
@@ -218,42 +250,75 @@
             baseUrl: localStorage.getItem('GEMINI_BASE_URL') || ''
         };
 
-        // --- MASTERY HISTORY LOGIC ---
+        // --- STORAGE KEYS ---
         const MASTERY_KEY = 'HANZI_MASTERY_LIST';
-        const MAX_MASTERY_SIZE = 100; // Keep track of last 100 mastered characters
+        const MISTAKE_KEY = 'HANZI_MISTAKES_LIST';
+        const MAX_MASTERY_SIZE = 100;
 
+        // --- MASTERY LOGIC ---
         function getMasteredChars() {
-            try {
-                const stored = localStorage.getItem(MASTERY_KEY);
-                return stored ? JSON.parse(stored) : [];
-            } catch (e) {
-                return [];
-            }
+            try { return JSON.parse(localStorage.getItem(MASTERY_KEY) || '[]'); } catch (e) { return []; }
         }
 
         function saveMastery(char) {
             let list = getMasteredChars();
-            // Remove if exists to re-add at end (refresh recency)
             list = list.filter(c => c !== char);
             list.push(char);
-            // Cap size
-            if (list.length > MAX_MASTERY_SIZE) {
-                list = list.slice(list.length - MAX_MASTERY_SIZE);
-            }
+            if (list.length > MAX_MASTERY_SIZE) list = list.slice(list.length - MAX_MASTERY_SIZE);
             localStorage.setItem(MASTERY_KEY, JSON.stringify(list));
-            updateMasteryDisplay();
-        }
-
-        function updateMasteryDisplay() {
-            const list = getMasteredChars();
-            const el = document.getElementById('mastery-count');
-            if(el) el.innerText = list.length;
+            updateStats();
         }
 
         window.clearMastery = () => {
             if(confirm('确定要清空所有已学会的汉字记录吗？')) {
                 localStorage.removeItem(MASTERY_KEY);
-                updateMasteryDisplay();
+                updateStats();
+            }
+        }
+
+        // --- MISTAKE BANK LOGIC ---
+        function getMistakes() {
+            try { return JSON.parse(localStorage.getItem(MISTAKE_KEY) || '[]'); } catch (e) { return []; }
+        }
+
+        function addToMistakes(item) {
+            let list = getMistakes();
+            // Avoid duplicates
+            if (!list.find(i => i.character === item.character)) {
+                list.push(item);
+                localStorage.setItem(MISTAKE_KEY, JSON.stringify(list));
+                updateStats();
+            }
+        }
+
+        function removeFromMistakes(char) {
+            let list = getMistakes();
+            const initialLength = list.length;
+            list = list.filter(i => i.character !== char);
+            if (list.length !== initialLength) {
+                localStorage.setItem(MISTAKE_KEY, JSON.stringify(list));
+                updateStats();
+                return true; // Indicates it was removed
+            }
+            return false;
+        }
+
+        function updateStats() {
+            // Update Mastery Count
+            const masterList = getMasteredChars();
+            const elMastery = document.getElementById('mastery-count');
+            if(elMastery) elMastery.innerText = masterList.length;
+
+            // Update Mistake Badge
+            const mistakeList = getMistakes();
+            const elBadge = document.getElementById('mistake-badge-main');
+            if (elBadge) {
+                if (mistakeList.length > 0) {
+                    elBadge.innerText = mistakeList.length;
+                    elBadge.classList.remove('hidden');
+                } else {
+                    elBadge.classList.add('hidden');
+                }
             }
         }
 
@@ -265,15 +330,16 @@
             finished: document.getElementById('screen-finished')
         };
         const modals = {
-            feedback: document.getElementById('modal-feedback')
+            feedback: document.getElementById('modal-feedback'),
+            mistakes: document.getElementById('modal-mistakes')
         };
         const inputKey = document.getElementById('api-key-input');
         const inputBaseUrl = document.getElementById('base-url-input');
 
-        // Initialize Inputs and Mastery
+        // Init
         if (appState.apiKey) inputKey.value = appState.apiKey;
         if (appState.baseUrl) inputBaseUrl.value = appState.baseUrl;
-        updateMasteryDisplay();
+        updateStats();
 
         // --- NAVIGATION ---
         function showScreen(name) {
@@ -284,15 +350,72 @@
         window.goHome = () => {
             playSound('click');
             showScreen('welcome');
-            updateMasteryDisplay();
+            updateStats();
         };
 
-        // --- GAME START LOGIC ---
+        // --- MISTAKE UI HANDLERS ---
+        window.openMistakeModal = () => {
+            playSound('click');
+            const list = getMistakes();
+            const container = document.getElementById('mistake-list');
+            const emptyState = document.getElementById('mistake-empty-state');
+            const btnReview = document.getElementById('btn-review-mistakes');
+            
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                emptyState.classList.remove('hidden');
+                btnReview.classList.add('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                btnReview.classList.remove('hidden');
+                
+                list.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = "flex items-center justify-between bg-orange-50 p-3 rounded-xl border border-orange-100";
+                    row.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl font-black text-orange-600 bg-white w-12 h-12 flex items-center justify-center rounded-lg shadow-sm border border-orange-200">${item.character}</span>
+                            <span class="text-lg font-bold text-gray-600">${item.pinyin}</span>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                });
+            }
+
+            modals.mistakes.classList.remove('hidden');
+        }
+
+        window.closeMistakeModal = () => {
+            playSound('click');
+            modals.mistakes.classList.add('hidden');
+        }
+
+        window.startReviewGame = () => {
+            const list = getMistakes();
+            if (list.length === 0) return;
+            
+            window.closeMistakeModal();
+            playSound('start');
+            
+            // Setup Review Mode
+            appState.mode = 'REVIEW';
+            // Shuffle mistakes
+            appState.items = [...list].sort(() => Math.random() - 0.5);
+            // Limit to 10 for a session, or take all if less
+            if (appState.items.length > 10) appState.items = appState.items.slice(0, 10);
+            
+            appState.currentIndex = 0;
+            appState.score = 0;
+            renderQuestion();
+            showScreen('quiz');
+        }
+
+        // --- GAME START LOGIC (API) ---
         window.startGame = async (mode) => {
-            initAudio(); // Unlock audio context
+            initAudio(); 
             playSound('start');
 
-            // Save Config
             const key = inputKey.value.trim();
             const url = inputBaseUrl.value.trim();
             
@@ -310,7 +433,6 @@
             showScreen('loading');
 
             try {
-                // Fetch Data with Mastery Filter
                 const mastered = getMasteredChars();
                 const data = await fetchQuizData(appState.apiKey, appState.baseUrl, mastered);
                 appState.items = data.items;
@@ -331,63 +453,65 @@
         };
 
         window.replayGame = () => {
-            window.startGame(appState.mode);
+            // If we were Reviewing, restart review with remaining mistakes
+            if (appState.mode === 'REVIEW') {
+                const list = getMistakes();
+                if (list.length > 0) {
+                    window.startReviewGame();
+                } else {
+                    alert("错题全部复习完啦！真棒！");
+                    goHome();
+                }
+            } else {
+                window.startGame(appState.mode);
+            }
         };
 
         // --- GEMINI SERVICE ---
         async function fetchQuizData(apiKey, baseUrl, excludedChars) {
-            // Configure GenAI options
             const options = { apiKey };
-            if (baseUrl && baseUrl.length > 0) {
-                options.baseUrl = baseUrl;
-            }
+            if (baseUrl && baseUrl.length > 0) options.baseUrl = baseUrl;
 
             const ai = new GoogleGenAI(options);
-            
-            // Limit excluded chars in prompt to avoid token limits, take last 50
             const excludedStr = excludedChars.slice(-50).join(', ');
 
             const prompt = `
             Create 10 quiz items for Chinese primary school students (Grades 1-2).
-            
-            **IMPORTANT**: Exclude the following characters as the user has already mastered them: [${excludedStr}].
-            Please choose characters NOT in this list.
-
+            **IMPORTANT**: Exclude these chars: [${excludedStr}]. Choose different simple ones.
             Format: JSON.
             Structure:
             {
               "items": [
                 {
                   "character": "汉字",
-                  "pinyin": "correct pinyin",
-                  "wrongPinyins": ["wrong1", "wrong2", "wrong3"],
+                  "pinyin": "pinyin",
+                  "wrongPinyins": ["w1", "w2", "w3"],
                   "wrongChars": ["错1", "错2", "错3"],
                   "examples": [
-                    {"word": "词语1", "pinyin": "pinyin1"},
-                    {"word": "词语2", "pinyin": "pinyin2"},
-                    {"word": "词语3", "pinyin": "pinyin3"}
+                    {"word": "词1", "pinyin": "p1"},
+                    {"word": "词2", "pinyin": "p2"},
+                    {"word": "词3", "pinyin": "p3"}
                   ]
                 }
               ]
-            }
-            Make sure characters are common simple ones suited for children.
-            `;
+            }`;
 
             const response = await ai.models.generateContent({
                 model: "gemini-2.5-flash",
                 contents: prompt,
-                config: {
-                    responseMimeType: "application/json"
-                }
+                config: { responseMimeType: "application/json" }
             });
-
             return JSON.parse(response.text);
         }
 
         // --- RENDER GAME ---
         function renderQuestion() {
             const item = appState.items[appState.currentIndex];
-            const isHanzi = appState.mode === 'HANZI_TO_PINYIN';
+            // In Review mode, default to Hanzi->Pinyin, or randomize? Let's use Hanzi->Pinyin for consistency unless we track mode in item
+            // But if Pinyin->Hanzi mode was used, item structure is same.
+            // Let's check appState.mode. If REVIEW, we default to showing Hanzi (more common for review).
+            
+            const isHanziMode = (appState.mode === 'HANZI_TO_PINYIN' || appState.mode === 'REVIEW');
 
             // Update Header
             document.getElementById('current-q-num').innerText = appState.currentIndex + 1;
@@ -395,45 +519,53 @@
             document.getElementById('progress-bar').style.width = `${((appState.currentIndex) / appState.items.length) * 100}%`;
 
             // Update Card
-            document.getElementById('question-instruction').innerText = isHanzi ? "请选择正确的拼音" : "请选择对应的汉字";
+            document.getElementById('question-instruction').innerText = isHanziMode ? "请选择正确的拼音" : "请选择对应的汉字";
             const qText = document.getElementById('question-text');
-            qText.innerText = isHanzi ? item.character : item.pinyin;
-            qText.className = isHanzi ? "font-black z-10 text-slate-700 text-8xl transition-all" : "font-black z-10 text-slate-700 text-6xl transition-all";
+            qText.innerText = isHanziMode ? item.character : item.pinyin;
+            
+            // Adjust font size for pinyin vs hanzi
+            qText.className = isHanziMode 
+                ? "font-black z-10 text-slate-700 text-8xl transition-all" 
+                : "font-black z-10 text-slate-700 text-6xl transition-all";
 
             // Options
-            const correct = isHanzi ? item.pinyin : item.character;
-            const wrongs = isHanzi ? item.wrongPinyins : item.wrongChars;
+            const correct = isHanziMode ? item.pinyin : item.character;
+            const wrongs = isHanziMode ? item.wrongPinyins : item.wrongChars;
             const options = [...wrongs, correct].sort(() => Math.random() - 0.5);
 
             const grid = document.getElementById('options-grid');
-            grid.innerHTML = ''; // Clear
+            grid.innerHTML = ''; 
 
             options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = "bg-white hover:bg-sky-50 hover:text-sky-600 hover:border-sky-300 text-slate-600 border-2 border-slate-200 font-bold rounded-2xl h-20 text-2xl shadow-sm active:scale-95 transition-all";
                 btn.innerText = opt;
-                btn.onclick = () => handleAnswer(opt, correct, item.character);
+                btn.onclick = () => handleAnswer(opt, correct, item);
                 grid.appendChild(btn);
             });
         }
 
-        function handleAnswer(selected, correct, character) {
+        function handleAnswer(selected, correct, item) {
             const isCorrect = selected === correct;
+            let removedFromMistakes = false;
+
             if (isCorrect) {
                 appState.score++;
                 playSound('correct');
-                saveMastery(character); // Save to history
+                saveMastery(item.character);
+                // Important: Remove from mistakes if correct!
+                removedFromMistakes = removeFromMistakes(item.character);
             } else {
                 playSound('wrong');
+                // Add to mistakes if wrong!
+                addToMistakes(item);
             }
 
-            showFeedback(isCorrect);
+            showFeedback(isCorrect, removedFromMistakes);
         }
 
-        function showFeedback(isCorrect) {
+        function showFeedback(isCorrect, removedFromMistakes) {
             const item = appState.items[appState.currentIndex];
-            
-            // UI Updates
             const title = document.getElementById('feedback-title');
             const iconBg = document.getElementById('feedback-icon-bg');
             const icon = document.getElementById('feedback-icon');
@@ -443,11 +575,16 @@
                 title.className = "text-3xl font-bold mb-2 text-green-500";
                 iconBg.className = "rounded-full p-4 border-4 border-white shadow-lg bg-green-400";
                 icon.innerText = "🌟";
+                
+                if (removedFromMistakes) {
+                    title.innerHTML += "<br><span class='text-sm text-orange-400'>已从错题本移出!</span>";
+                }
+
             } else {
-                title.innerText = "再接再厉！";
-                title.className = "text-3xl font-bold mb-2 text-rose-500";
-                iconBg.className = "rounded-full p-4 border-4 border-white shadow-lg bg-rose-400";
-                icon.innerText = "🤔";
+                title.innerText = "记入错题本！";
+                title.className = "text-3xl font-bold mb-2 text-orange-500";
+                iconBg.className = "rounded-full p-4 border-4 border-white shadow-lg bg-orange-400";
+                icon.innerText = "📝";
             }
 
             document.getElementById('fb-char').innerText = item.character;
@@ -489,7 +626,7 @@
             let emoji = '😐'; 
             let title = '完成!';
             
-            if(percent === 100) { emoji='🏆'; title='太棒了! 满分!'; }
+            if(percent === 100) { emoji='🏆'; title='满分! 太棒了!'; }
             else if(percent >= 80) { emoji='🎉'; title='非常优秀!'; }
             else if(percent >= 60) { emoji='👍'; title='继续加油!'; }
 
@@ -497,9 +634,8 @@
             document.getElementById('final-title').innerText = title;
         }
 
-        // --- AUDIO SERVICE (Vanilla JS Version) ---
+        // --- AUDIO SERVICE (Vanilla) ---
         let audioCtx = null;
-
         window.initAudio = () => {
             if (!audioCtx) {
                 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -521,23 +657,19 @@
                 osc.frequency.exponentialRampToValueAtTime(1000, t + 0.08);
                 gain.gain.setValueAtTime(0.05, t);
                 gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(t);
-                osc.stop(t + 0.08);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(t); osc.stop(t + 0.08);
             } else if (type === 'correct') {
                 [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
-                    const filter = audioCtx.createBiquadFilter();
                     osc.type = 'triangle';
-                    filter.type = "lowpass"; filter.frequency.value = 2000;
                     osc.frequency.setValueAtTime(f, t);
                     const st = t + i * 0.08;
                     gain.gain.setValueAtTime(0, st);
                     gain.gain.linearRampToValueAtTime(0.05, st + 0.02);
                     gain.gain.exponentialRampToValueAtTime(0.001, st + 0.4);
-                    osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
                     osc.start(st); osc.stop(st + 0.5);
                 });
             } else if (type === 'wrong') {
